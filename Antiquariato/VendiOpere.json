@@ -1,0 +1,164 @@
+[
+  {
+    "nomeCliente": "Giovanni Falco",
+    "numero": "0303030303",
+    "nome": "prova non mollo mai",
+    "descrizione": "mmomo",
+    "immagine1": [
+      {
+        "type": "Buffer",
+        "data": [
+          83,
+          99,
+          114,
+          101,
+          101,
+          110,
+          115,
+          104,
+          111,
+          116,
+          32,
+          50,
+          48,
+          50,
+          52,
+          45,
+          48,
+          49,
+          45,
+          48,
+          53,
+          32,
+          49,
+          50,
+          53,
+          49,
+          50,
+          52,
+          46,
+          112,
+          110,
+          103
+        ]
+      }
+    ],
+    "immagine2": [
+      {
+        "type": "Buffer",
+        "data": []
+      }
+    ],
+    "immagine3": [
+      {
+        "type": "Buffer",
+        "data": []
+      }
+    ],
+    "immagine4": [
+      {
+        "type": "Buffer",
+        "data": []
+      }
+    ],
+    "tecnica": "a mano",
+    "dimensione": "3030",
+    "peso": "200grammi",
+    "altezza": "20cm",
+    "prezzo": "25",
+    "_id": "659eb6318a7fa6fec5dd28a5"
+  },
+  {
+    "immagine1": [],
+    "immagine2": [],
+    "immagine3": [],
+    "immagine4": [],
+    "_id": "659ebf13306f746465a5945f"
+  },
+  {
+    "immagine1": [],
+    "immagine2": [],
+    "immagine3": [],
+    "immagine4": [],
+    "_id": "659ebf5e306f746465a59461"
+  },
+  {
+    "immagine1": [],
+    "immagine2": [],
+    "immagine3": [],
+    "immagine4": [],
+    "_id": "659ebf96306f746465a59463"
+  },
+  {
+    "nomeCliente": "artcollector55",
+    "numero": "+39 123 456 7890",
+    "nome": "Natura Morta",
+    "descrizione": "dipinto realistico",
+    "immagine1": [
+      {
+        "type": "Buffer",
+        "data": []
+      }
+    ],
+    "immagine2": [
+      {
+        "type": "Buffer",
+        "data": []
+      }
+    ],
+    "immagine3": [
+      {
+        "type": "Buffer",
+        "data": []
+      }
+    ],
+    "immagine4": [
+      {
+        "type": "Buffer",
+        "data": []
+      }
+    ],
+    "tecnica": "Tempera su tavola",
+    "dimensione": "40cmx60",
+    "peso": "",
+    "altezza": "",
+    "prezzo": "7500",
+    "_id": "65a0026167c8dbdee5b76802"
+  },
+  {
+    "nomeCliente": "artcollector55",
+    "numero": "+39 123 456 7890",
+    "nome": "Natura ìViva",
+    "descrizione": "opera 3D",
+    "immagine1": [
+      {
+        "type": "Buffer",
+        "data": []
+      }
+    ],
+    "immagine2": [
+      {
+        "type": "Buffer",
+        "data": []
+      }
+    ],
+    "immagine3": [
+      {
+        "type": "Buffer",
+        "data": []
+      }
+    ],
+    "immagine4": [
+      {
+        "type": "Buffer",
+        "data": []
+      }
+    ],
+    "tecnica": "stampante",
+    "dimensione": "",
+    "peso": "",
+    "altezza": "",
+    "prezzo": "8000",
+    "_id": "65a04ba38d62a6f02f4d4c01"
+  }
+]

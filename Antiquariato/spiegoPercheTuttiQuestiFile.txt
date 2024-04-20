@@ -1,0 +1,10 @@
+ho inserito tanti file.json per solo un motivo, 
+quando volevo collegare i due database mi dava errore.
+
+Quindi la soluzione a cui ho pensato è stata la seguente, anzichè leggere dal database è quella di scrivere tutto su un file e poi leggere da li!
+
+STATO: lo stato delle opere, accetto/proponi o rifiutato.
+VendiOpere:  per leggere da parte del gestore le opere che il client vuole vendere
+Richieste:Richiesta di vendere le opere da parte del client
+Report Vendite e ordine servono per i report 
+Opere: le opere che il Gestore vuole Vendere

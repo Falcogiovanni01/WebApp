@@ -1,0 +1,47 @@
+[
+  {
+    "id": 25.126563541065906,
+    "utente": "Michele alfiero",
+    "data": "2024-01-11",
+    "prezzo": 0,
+    "prodottiAcquistati": [
+      {
+        "codice": "001",
+        "prezzo": "0",
+        "quantita": 1,
+        "_id": "65a0501eb4d9ffc5601434b3"
+      },
+      {
+        "codice": "010",
+        "prezzo": "0",
+        "quantita": 1,
+        "_id": "65a0501eb4d9ffc5601434b4"
+      }
+    ],
+    "_id": "65a0501eb4d9ffc5601434b2",
+    "__v": 0
+  },
+
+  {
+    "id": 59.024930840503245,
+    "utente": "Giovanni Falco",
+    "data": "2024-01-11",
+    "prezzo": 3300,
+    "prodottiAcquistati": [
+      {
+        "codice": "115",
+        "prezzo": "300",
+        "quantita": 1,
+        "_id": "65a050f70fbdf8c2e5a5b924"
+      },
+      {
+        "codice": "114",
+        "prezzo": "3000",
+        "quantita": 1,
+        "_id": "65a050f70fbdf8c2e5a5b925"
+      }
+    ],
+    "_id": "65a050f70fbdf8c2e5a5b923",
+    "__v": 0
+  }
+]

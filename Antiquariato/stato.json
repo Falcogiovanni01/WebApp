@@ -1,0 +1,41 @@
+[
+  {
+    "nomeCliente": "Giovanni Falco",
+    "nome": "prova non mollo mai",
+    "immagine1": [],
+    "immagine2": [],
+    "immagine3": [],
+    "immagine4": [],
+    "prezzo": "25",
+    "_id": "659ecdc769492418211fb1f4"
+  },
+  {
+    "prezzo": "25",
+    "stato": "Accetto",
+    "_id": "659ece3b1ca5598d05d4b321"
+  },
+  {
+    "prezzo": "25",
+    "stato": "accetta",
+    "_id": "659ecf77f980cc9d721e59c9"
+  },
+  {
+    "prezzo": "4000",
+    "stato": "accetta",
+    "_id": "65a003d867c8dbdee5b76804"
+  },
+  {
+    "nomeCliente": "artcollector55",
+    "nome": "Natura Morta",
+    "prezzo": "4000",
+    "stato": "accetto",
+    "_id": "65a004655312d69ae57f3499"
+  },
+  {
+    "nomeCliente": "artcollector55",
+    "nome": "Natura ìViva",
+    "prezzo": "5000",
+    "stato": "accetto",
+    "_id": "65a04c7bb4d9ffc5601434a8"
+  }
+]

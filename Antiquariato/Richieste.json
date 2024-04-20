@@ -1,0 +1,29 @@
+[
+  {
+    "nomeCliente": "Giovanni Falco",
+    "nome": "prova non mollo mai",
+    "_id": "659ec782e4cf63b2785107d3"
+  },
+  {
+    "nomeCliente": "artcollector55",
+    "nome": "Natura Morta , per me vale 4000",
+    "_id": "65a002836e117c603f324f3d"
+  },
+  {
+    "nomeCliente": "artcollector55",
+    "nome": "Natura Morta",
+    "_id": "65a00319c44e198f7e25709c"
+  },
+  {
+    "nomeCliente": "artcollector55",
+    "nome": "natura morta",
+    "prezzoVendita": "4000",
+    "_id": "65a003a8ac801b105e12c320"
+  },
+  {
+    "nomeCliente": "artcollector55",
+    "nome": "",
+    "prezzoVendita": "5000",
+    "_id": "65a04baf49fb39d8c5dae8d0"
+  }
+]

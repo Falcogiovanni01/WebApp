@@ -1,0 +1,381 @@
+[
+  {
+    "codice": "007",
+    "nome": "computer",
+    "descrizione": "primo MAC",
+    "prezzo": "1000",
+    "immagine1": [
+      {
+        "type": "Buffer",
+        "data": []
+      }
+    ],
+    "immagine2": [
+      {
+        "type": "Buffer",
+        "data": []
+      }
+    ],
+    "immagine3": [
+      {
+        "type": "Buffer",
+        "data": []
+      }
+    ],
+    "immagine4": [
+      {
+        "type": "Buffer",
+        "data": []
+      }
+    ],
+    "tecnica": "",
+    "dimensione": "",
+    "peso": "",
+    "altezza": "",
+    "_id": "659adc50dd5e083f03fb2f47"
+  },
+  {
+    "codice": "009",
+    "nome": "bracciale",
+    "descrizione": "oro",
+    "prezzo": "1000",
+    "immagine1": [
+      {
+        "type": "Buffer",
+        "data": []
+      }
+    ],
+    "immagine2": [
+      {
+        "type": "Buffer",
+        "data": []
+      }
+    ],
+    "immagine3": [
+      {
+        "type": "Buffer",
+        "data": []
+      }
+    ],
+    "immagine4": [
+      {
+        "type": "Buffer",
+        "data": []
+      }
+    ],
+    "tecnica": "",
+    "dimensione": "",
+    "peso": "",
+    "altezza": "",
+    "_id": "659add5bb57a6f37e18efc34"
+  },
+  {
+    "codice": "110",
+    "nome": "DavidMichelangelo",
+    "descrizione": "bello grande",
+    "prezzo": "250",
+    "immagine1": [
+      {
+        "type": "Buffer",
+        "data": [
+          83,
+          99,
+          114,
+          101,
+          101,
+          110,
+          115,
+          104,
+          111,
+          116,
+          32,
+          50,
+          48,
+          50,
+          51,
+          45,
+          49,
+          49,
+          45,
+          49,
+          51,
+          32,
+          50,
+          49,
+          52,
+          49,
+          52,
+          54,
+          46,
+          112,
+          110,
+          103
+        ]
+      }
+    ],
+    "immagine2": [
+      {
+        "type": "Buffer",
+        "data": []
+      }
+    ],
+    "immagine3": [
+      {
+        "type": "Buffer",
+        "data": []
+      }
+    ],
+    "immagine4": [
+      {
+        "type": "Buffer",
+        "data": []
+      }
+    ],
+    "tecnica": "mano",
+    "dimensione": "grandi",
+    "peso": "pesante",
+    "altezza": "alto",
+    "_id": "659ed2d9557fc5164087b154"
+  },
+  {
+    "codice": "112",
+    "nome": "DavidDonatello",
+    "descrizione": "copia perfetta",
+    "prezzo": "250",
+    "immagine1": [
+      {
+        "type": "Buffer",
+        "data": [
+          83,
+          99,
+          114,
+          101,
+          101,
+          110,
+          115,
+          104,
+          111,
+          116,
+          32,
+          50,
+          48,
+          50,
+          51,
+          45,
+          49,
+          49,
+          45,
+          49,
+          51,
+          32,
+          50,
+          49,
+          52,
+          49,
+          52,
+          54,
+          46,
+          112,
+          110,
+          103
+        ]
+      }
+    ],
+    "immagine2": [
+      {
+        "type": "Buffer",
+        "data": []
+      }
+    ],
+    "immagine3": [
+      {
+        "type": "Buffer",
+        "data": []
+      }
+    ],
+    "immagine4": [
+      {
+        "type": "Buffer",
+        "data": []
+      }
+    ],
+    "tecnica": "mano",
+    "dimensione": "grandi",
+    "peso": "pesante",
+    "altezza": "alto",
+    "_id": "659ed34f6d8be1b59f426e3d"
+  },
+  {
+    "codice": "113",
+    "nome": "Ritratto di una Dama",
+    "descrizione": "Raffinato ritratto antico , rappresentante una donna con abiti d'epoca",
+    "prezzo": "5000",
+    "immagine1": [
+      {
+        "type": "Buffer",
+        "data": []
+      }
+    ],
+    "immagine2": [
+      {
+        "type": "Buffer",
+        "data": []
+      }
+    ],
+    "immagine3": [
+      {
+        "type": "Buffer",
+        "data": []
+      }
+    ],
+    "immagine4": [
+      {
+        "type": "Buffer",
+        "data": []
+      }
+    ],
+    "tecnica": "Olio su tela",
+    "dimensione": "60cm x 80 cm",
+    "peso": "",
+    "altezza": "",
+    "_id": "659ffffa6e117c603f324f32"
+  },
+  {
+    "codice": "114",
+    "nome": "Vittoria alata",
+    "descrizione": "opera arte antica",
+    "prezzo": "3000",
+    "immagine1": [
+      {
+        "type": "Buffer",
+        "data": []
+      }
+    ],
+    "immagine2": [
+      {
+        "type": "Buffer",
+        "data": []
+      }
+    ],
+    "immagine3": [
+      {
+        "type": "Buffer",
+        "data": []
+      }
+    ],
+    "immagine4": [
+      {
+        "type": "Buffer",
+        "data": []
+      }
+    ],
+    "tecnica": "",
+    "dimensione": "",
+    "peso": "18kg",
+    "altezza": "80cm",
+    "_id": "65a0002f6e117c603f324f34"
+  },
+  {
+    "codice": "115",
+    "nome": "Paesaggio sereno",
+    "descrizione": "paesaggio",
+    "prezzo": "300",
+    "immagine1": [
+      {
+        "type": "Buffer",
+        "data": []
+      }
+    ],
+    "immagine2": [
+      {
+        "type": "Buffer",
+        "data": []
+      }
+    ],
+    "immagine3": [
+      {
+        "type": "Buffer",
+        "data": []
+      }
+    ],
+    "immagine4": [
+      {
+        "type": "Buffer",
+        "data": []
+      }
+    ],
+    "tecnica": "Acrilico su tela",
+    "dimensione": "50cmx70cm",
+    "peso": "",
+    "altezza": "",
+    "_id": "65a000586e117c603f324f36"
+  },
+  {
+    "codice": "222",
+    "nome": "BELLA OPERA",
+    "descrizione": "DESCRIVI",
+    "prezzo": "1000",
+    "immagine1": [
+      {
+        "type": "Buffer",
+        "data": [
+          83,
+          99,
+          114,
+          101,
+          101,
+          110,
+          115,
+          104,
+          111,
+          116,
+          32,
+          50,
+          48,
+          50,
+          51,
+          45,
+          49,
+          49,
+          45,
+          49,
+          51,
+          32,
+          50,
+          49,
+          52,
+          49,
+          52,
+          54,
+          46,
+          112,
+          110,
+          103
+        ]
+      }
+    ],
+    "immagine2": [
+      {
+        "type": "Buffer",
+        "data": []
+      }
+    ],
+    "immagine3": [
+      {
+        "type": "Buffer",
+        "data": []
+      }
+    ],
+    "immagine4": [
+      {
+        "type": "Buffer",
+        "data": []
+      }
+    ],
+    "tecnica": "SU TELA",
+    "dimensione": "30X30",
+    "peso": "",
+    "altezza": "",
+    "_id": "65a6a1062fd82289ed3499c9"
+  }
+]
