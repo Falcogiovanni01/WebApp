@@ -377,5 +377,18 @@
     "peso": "",
     "altezza": "",
     "_id": "65a6a1062fd82289ed3499c9"
+  },
+  {
+    "codice": "0001",
+    "nome": "Colosseo",
+    "descrizione": "colosseo, miniatura ",
+    "prezzo": "100",
+    "immagine1": [],
+    "immagine2": [],
+    "immagine3": [],
+    "immagine4": [],
+    "tecnica": "fatta a mano",
+    "_id": "6a43d9ecbe9dab46a3365644",
+    "__v": 0
   }
 ]

@@ -1,9 +1,18 @@
 {
+  "name": "webapp",
+  "version": "1.0.0",
+  "scripts": {
+    "start": "node ServerCliente.js"
+  },
   "dependencies": {
     "axios": "^1.6.5",
     "cookie-parser": "^1.4.6",
     "express": "^4.18.2",
-    "mongoose": "^8.0.3",
-    "twilio": "^5.0.0-rc.1"
+    "mongoose": "^8.0.3"
+  },
+    "devDependencies": {
+    "chai": "^6.2.2",
+    "mocha": "^11.7.6",
+    "selenium-webdriver": "^4.45.0"
   }
 }
