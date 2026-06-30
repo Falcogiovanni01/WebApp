@@ -1,47 +1,104 @@
 [
   {
-    "id": 25.126563541065906,
-    "utente": "Michele alfiero",
-    "data": "2024-01-11",
-    "prezzo": 0,
+    "id": 32369,
+    "utente": "Gio",
+    "data": "2026-06-30",
+    "prezzo": 1250,
     "prodottiAcquistati": [
       {
-        "codice": "001",
-        "prezzo": "0",
+        "codice": "009",
+        "prezzo": "1000",
         "quantita": 1,
-        "_id": "65a0501eb4d9ffc5601434b3"
+        "_id": "6a43e055470683e489d984f1"
       },
       {
-        "codice": "010",
-        "prezzo": "0",
+        "codice": "112",
+        "prezzo": "250",
         "quantita": 1,
-        "_id": "65a0501eb4d9ffc5601434b4"
+        "_id": "6a43e055470683e489d984f2"
       }
     ],
-    "_id": "65a0501eb4d9ffc5601434b2",
+    "_id": "6a43e055470683e489d984f0",
     "__v": 0
   },
-
   {
-    "id": 59.024930840503245,
-    "utente": "Giovanni Falco",
-    "data": "2024-01-11",
-    "prezzo": 3300,
+    "id": 91878,
+    "utente": "Felice",
+    "data": "2026-06-30",
+    "prezzo": 1000,
     "prodottiAcquistati": [
       {
-        "codice": "115",
-        "prezzo": "300",
+        "codice": "007",
+        "prezzo": "1000",
         "quantita": 1,
-        "_id": "65a050f70fbdf8c2e5a5b924"
-      },
+        "_id": "6a43e1a0ffd080cd5831637f"
+      }
+    ],
+    "_id": "6a43e1a0ffd080cd5831637e",
+    "__v": 0
+  },
+  {
+    "id": 99710,
+    "utente": "Gio",
+    "data": "2026-06-30",
+    "prezzo": 3000,
+    "prodottiAcquistati": [
       {
         "codice": "114",
         "prezzo": "3000",
         "quantita": 1,
-        "_id": "65a050f70fbdf8c2e5a5b925"
+        "_id": "6a43e9b51378c9c769000ca4"
       }
     ],
-    "_id": "65a050f70fbdf8c2e5a5b923",
+    "_id": "6a43e9b51378c9c769000ca3",
+    "__v": 0
+  },
+  {
+    "id": 18748,
+    "utente": "Gio",
+    "data": "2026-06-30",
+    "prezzo": 100,
+    "prodottiAcquistati": [
+      {
+        "codice": "0001",
+        "prezzo": "100",
+        "quantita": 1,
+        "_id": "6a43e9c71378c9c769000cb1"
+      }
+    ],
+    "_id": "6a43e9c71378c9c769000cb0",
+    "__v": 0
+  },
+  {
+    "id": 60637,
+    "utente": "Gio",
+    "data": "2026-06-30",
+    "prezzo": 1000,
+    "prodottiAcquistati": [
+      {
+        "codice": "009",
+        "prezzo": "1000",
+        "quantita": 1,
+        "_id": "6a43e9ce1378c9c769000cbe"
+      }
+    ],
+    "_id": "6a43e9ce1378c9c769000cbd",
+    "__v": 0
+  },
+  {
+    "id": 8391,
+    "utente": "Gio",
+    "data": "2026-06-30",
+    "prezzo": 1000,
+    "prodottiAcquistati": [
+      {
+        "codice": "002",
+        "prezzo": "1000",
+        "quantita": 1,
+        "_id": "6a43eafd4fc1783523f49c48"
+      }
+    ],
+    "_id": "6a43eafc4fc1783523f49c47",
     "__v": 0
   }
 ]

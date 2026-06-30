@@ -6,10 +6,15 @@ const mongoose = require('mongoose');
 const app = express();
 const PORT = 3000;
 
-// Middleware nativi di Express (sostituiscono body-parser)
-app.use(express.static(path.join(__dirname, 'Gestore')));
+
+// DEFINIZIONE DEI PERCORSI
+const STATIC_DIR = path.join(__dirname, 'Gestore'); 
+app.use(express.static(STATIC_DIR));
 app.use(express.urlencoded({ extended: true }));
 app.use(express.json());
+// Aggiungi subito dopo le importazioni
+const ADMIN_USER = "admin";
+const ADMIN_PASS = "admin"; // In un contesto reale useresti hash, ma per l'esame è perfetto così
 
 
 app.get('/', (req, res) => {
@@ -64,6 +69,22 @@ function logAction(action, details) {
 }
 
 // --- ROTTE API ---
+// Login Gestore
+app.post('/loginGestore', (req, res) => {
+    const { username, password } = req.body;
+    
+    if (username === ADMIN_USER && password === ADMIN_PASS) {
+        // Scriviamo il cookie nativamente come nel Cliente
+        res.cookie('gestoreSession', 'admin', {
+            httpOnly: true,
+            maxAge: 1000 * 60 * 60 * 2 // 2 ore
+        });
+        res.json({ success: true });
+    } else {
+        res.status(401).json({ success: false, message: "Accesso negato" });
+    }
+});
+
 
 app.get('/AggiuntaOpera', (req, res) => {
     res.send('Endpoint temporaneo per lo sviluppo.');
@@ -97,27 +118,71 @@ app.post('/AggiungiOpera', async (req, res) => {
 // Modifica Opera
 app.post('/ModificaOpera', async (req, res) => {
     try {
-        const conditions = { codice: req.body.codice, nome: req.body.nome };
+        // FIX: Cerchiamo SOLO per codice. Il nome può essere cambiato dall'utente!
+        const condition = { codice: req.body.codice };
         const update = { $set: { ...req.body } };
         
-        const result = await Opera.findOne(conditions);
+        const result = await Opera.findOne(condition);
         if (!result) {
-            console.log('Elemento non presente');
+            console.log('Elemento non presente nel DB', req.body);
             return res.status(404).json({ message: 'Elemento non presente' });
         }
 
-        const updateResult = await Opera.updateOne(conditions, update);
-        if (updateResult.modifiedCount > 0) {
-            console.log('Aggiornamento avvenuto con successo');
-            return res.json({ message: 'Riepilogo opera aggiornata:', data: req.body });
-        } else {
-            return res.json({ message: 'Elemento presente ma non modificato' });
+        const updateResult = await Opera.updateOne(condition, update);
+        
+        // AGGIORNAMENTO DEL FILE Opere.json (Per far vedere la modifica ai clienti)
+        if (fs.existsSync(opereFilePath)) {
+            let opere = JSON.parse(fs.readFileSync(opereFilePath, 'utf-8') || '[]');
+            const index = opere.findIndex(o => o.codice === req.body.codice);
+            if (index !== -1) {
+                // Fonde i vecchi dati con i nuovi (es. nuovo prezzo o nome)
+                opere[index] = { ...opere[index], ...req.body };
+                fs.writeFileSync(opereFilePath, JSON.stringify(opere, null, 2), 'utf-8');
+            }
         }
+
+        return res.json({ message: 'Opera aggiornata con successo!', data: req.body });
+        
     } catch (error) {
         console.error('Errore durante la modifica:', error);
         res.status(500).json({ message: "Errore durante l'operazione" });
     }
 });
+
+// Rimuovi Opera
+app.post('/RimuoviOpera', async (req, res) => {
+    try {
+        // FIX: Cerchiamo SOLO per codice per non rischiare errori di battitura sul nome
+        const condition = { codice: req.body.codice };
+        const result = await Opera.findOne(condition);
+        
+        if (!result) {
+            console.log('Elemento non presente');
+            return res.status(404).json({ message: 'Elemento non presente' });
+        }
+
+        const deleteResult = await Opera.deleteOne(condition);
+        if (deleteResult.deletedCount > 0) {
+            console.log('Eliminazione avvenuta con successo dal DB');
+            
+            // RIMOZIONE DAL FILE Opere.json
+            if (fs.existsSync(opereFilePath)) {
+                let opere = JSON.parse(fs.readFileSync(opereFilePath, 'utf-8') || '[]');
+                const opereAggiornate = opere.filter(o => o.codice !== req.body.codice);
+                fs.writeFileSync(opereFilePath, JSON.stringify(opereAggiornate, null, 2), 'utf-8');
+            }
+
+            res.json({ message: 'Opera eliminata definitivamente dal sistema.', data: result });
+        } else {
+            res.json({ message: "Errore durante l'eliminazione" });
+        }
+    } catch (error) {
+        console.error('Errore durante la rimozione:', error);
+        res.status(500).json({ message: "Errore durante l'operazione" });
+    }
+});
+
+
 
 // Rimuovi Opera
 app.post('/RimuoviOpera', async (req, res) => {

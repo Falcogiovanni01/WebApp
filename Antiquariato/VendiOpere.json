@@ -172,5 +172,17 @@
     "prezzo": "80",
     "_id": "6a43da10caaaa4e4d1b26580",
     "__v": 0
+  },
+  {
+    "nomeCliente": "Felice",
+    "nome": "COMPUTER VECCHIO",
+    "descrizione": "è VECCHIO MA FUNZIONA, COMPRATELO",
+    "immagine1": [],
+    "immagine2": [],
+    "immagine3": [],
+    "immagine4": [],
+    "prezzo": "100",
+    "_id": "6a43e1bdffd080cd58316384",
+    "__v": 0
   }
 ]

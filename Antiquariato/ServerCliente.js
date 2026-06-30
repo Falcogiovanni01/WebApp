@@ -1,46 +1,33 @@
 const express = require('express');
-const bodyParser = require('body-parser');
 const fs = require('fs');
 const path = require('path');
-const http = require('http');
 const mongoose = require('mongoose');
 
 const app = express();
+const PORT = 3001;
 
-// ============================================================
-// FIX #1: Nome cartella corretto (case-sensitive su Mac/Linux)
-// Sostituisci 'client' qui sotto con il nome ESATTO della tua cartella
-// ============================================================
+// Nome della cartella contenente i file statici del client
 const STATIC_DIR = path.join(__dirname, 'Client'); 
 
+// Middleware nativi di Express
 app.use(express.static(STATIC_DIR));
-app.use(bodyParser.urlencoded({ extended: true }));
-app.use(bodyParser.json()); // utile se in futuro mandi JSON dal client invece di urlencoded
+app.use(express.urlencoded({ extended: true }));
+app.use(express.json());
 
 // ============================================================
-// FIX #2: Route esplicita per la home, perché il file si chiama
-// client.html e non index.html (Express serve solo index.html in automatico)
+// FIX #2: Mantenuto - Route esplicita per la home page cliente
 // ============================================================
 app.get('/', (req, res) => {
   res.sendFile(path.join(STATIC_DIR, 'Cliente.html'));
 });
 
-// ============================================================
-// Connessione MongoDB - resta locale per ora come da richiesta precedente
-// (se passi ad Atlas, sostituisci questa stringa con quella di Atlas)
-// ============================================================
-mongoose.connect('mongodb://localhost:27017/Cliente')
+// Connessione MongoDB (utilizzato l'IP standard 127.0.0.1 per stabilità su ambienti Unix/Mac)
+mongoose.connect('mongodb://127.0.0.1:27017/Cliente')
   .then(() => console.log('Connessione con MongoDB avvenuta con successo'))
-  .catch((error) => console.log('ERRORE CONNESSIONE CON MONGODB NON RIUSCITA', error));
+  .catch((error) => console.error('ERRORE CONNESSIONE CON MONGODB NON RIUSCITA:', error));
 
-const db = mongoose.connection;
-db.on('error', (error) => {
-  console.log('Errore di connessione MongoDB:', error);
-});
+// --- SCHEMAS E MODELLI ---
 
-// ============================================================
-// Schemi (invariati rispetto all'originale)
-// ============================================================
 const ClienteSchema = new mongoose.Schema({
   nome: String,
   password: String,
@@ -102,9 +89,45 @@ const OffertaSchema = new mongoose.Schema({
 });
 const Offerta = mongoose.model('Offerta', OffertaSchema);
 
-// ============================================================
-// ROUTES
-// ============================================================
+// File Paths Relativi
+const opereFilePath = path.join(__dirname, 'Opere.json');
+const ordiniFilePath = path.join(__dirname, 'Ordini.json');
+const vendiOpereFilePath = path.join(__dirname, 'VendiOpere.json');
+const richiesteFilePath = path.join(__dirname, 'Richieste.json');
+const statoFilePath = path.join(__dirname, 'stato.json');
+const reportVenditeFilePath = path.join(__dirname, 'ReportVendite.json');
+
+// --- HELPER FUNCTIONS ---
+
+function simulateSendSMS(numeroUtente, smsMessage, messaggi) {
+  console.log('Simulazione SMS inviato a', numeroUtente, 'con il messaggio:', smsMessage);
+  console.log('Messaggi dettagliati:', messaggi);
+}
+
+function getCurrentDate() {
+  const today = new Date();
+  const year = today.getFullYear();
+  const month = String(today.getMonth() + 1).padStart(2, '0');
+  const day = String(today.getDate()).padStart(2, '0');
+  return `${year}-${month}-${day}`;
+}
+
+// Helper per aggiornare i file JSON in modo sicuro senza corrompere la sintassi degli array
+function safeAppendToJsonFile(filePath, newItem) {
+  let list = [];
+  if (fs.existsSync(filePath)) {
+    try {
+      const fileData = fs.readFileSync(filePath, 'utf-8');
+      list = fileData ? JSON.parse(fileData) : [];
+    } catch (e) {
+      list = [];
+    }
+  }
+  list.push(newItem);
+  fs.writeFileSync(filePath, JSON.stringify(list, null, 2), 'utf-8');
+}
+
+// --- ROTTE API ---
 
 // REGISTRAZIONE
 app.post('/registrazione', async (req, res) => {
@@ -116,7 +139,7 @@ app.post('/registrazione', async (req, res) => {
       carta: req.body.carta
     });
     await newCliente.save();
-    console.log('Utente aggiunto');
+    console.log('Utente aggiunto nel DB');
 
     const newLogin = new LoginCliente({ nome: newCliente.nome, password: newCliente.password });
     await newLogin.save();
@@ -127,12 +150,12 @@ app.post('/registrazione', async (req, res) => {
     const riepilogo = `UTENTE REGISTRATO nome:${newCliente.nome} password:${newCliente.password} numero:${newCliente.numero} carta:${newCliente.carta}`;
     res.json({ riepilogo });
   } catch (err) {
-    console.log('Errore durante la registrazione', err);
+    console.error('Errore durante la registrazione:', err);
     res.status(500).json({ message: 'Errore durante la registrazione' });
   }
 });
 
-// LOGIN - qui dovrebbe nascere il cookie di sessione (vedi nota sotto)
+// LOGIN
 app.post('/login', async (req, res) => {
   const { nome, password } = req.body;
   try {
@@ -140,9 +163,7 @@ app.post('/login', async (req, res) => {
     if (result) {
       console.log('Accesso effettuato da:', nome);
 
-      // ============================================================
-      // FIX #3: il cookie di sessione ora viene SCRITTO davvero
-      // ============================================================
+      // Scrittura del cookie di sessione
       res.cookie('session', nome, {
         httpOnly: true,
         maxAge: 1000 * 60 * 60 * 2 // 2 ore
@@ -154,45 +175,123 @@ app.post('/login', async (req, res) => {
       res.status(401).json({ message: 'Credenziali non valide' });
     }
   } catch (err) {
-    console.error('Errore durante la query al database', err);
+    console.error('Errore durante il login:', err);
     res.status(500).json({ message: 'Errore durante il login' });
   }
 });
 
-// LOGOUT - aggiunto, mancava nell'originale
+// LOGOUT
 app.post('/logout', (req, res) => {
   res.clearCookie('session');
-  res.json({ message: 'Logout effettuato' });
+  res.json({ message: 'Logout effettuato con successo' });
 });
 
 // VISUALIZZA CATALOGO
 app.get('/visualizza', (req, res) => {
-  const filePath = path.join(__dirname, 'Opere.json');
-  fs.readFile(filePath, 'utf-8', (err, data) => {
+  if (!fs.existsSync(opereFilePath)) return res.json([]);
+  fs.readFile(opereFilePath, 'utf-8', (err, data) => {
     if (err) {
-      console.error('Errore durante la lettura del file', err);
-      return res.status(500).json({ message: 'errore' });
+      console.error('Errore durante la lettura del catalogo:', err);
+      return res.status(500).json({ message: 'Errore di lettura del catalogo' });
     }
-    res.json(JSON.parse(data));
+    res.json(JSON.parse(data || '[]'));
   });
 });
 
 // AGGIUNGI OPERA AL CARRELLO
+// AGGIUNGI OPERA AL CARRELLO
 app.post('/aggiungiCarrello', async (req, res) => {
   try {
-    const filePath = path.join(__dirname, 'Opere.json');
-    const opere = JSON.parse(fs.readFileSync(filePath, 'utf-8'));
+    let opere = [];
+    if (fs.existsSync(opereFilePath)) {
+      opere = JSON.parse(fs.readFileSync(opereFilePath, 'utf-8') || '[]');
+    }
+    // Recupera il prezzo corrispondente dal catalogo JSON
     const prezzoCorrispondente = opere.find((opera) => opera.codice === req.body.codice);
     const prezzoOpera = prezzoCorrispondente ? parseFloat(prezzoCorrispondente.prezzo) : 0;
 
-    const newCarrello = new Carrello({ nome: req.body.nome, codice: req.body.codice, prezzo: prezzoOpera });
+    // Salva l'elemento nel carrello MongoDB dell'utente
+    const newCarrello = new Carrello({ 
+      nome: req.body.nome, 
+      codice: req.body.codice, 
+      prezzo: prezzoOpera 
+    });
     await newCarrello.save();
 
-    const riepilogo = `Elemento aggiunto nel carrello nome:${newCarrello.nome} codice:${newCarrello.codice} prezzo:${newCarrello.prezzo}`;
-    res.json({ riepilogo });
+    res.json({ message: "Opera aggiunta al carrello con successo!" });
   } catch (err) {
-    console.log('Errore', err);
+    console.error("Errore aggiunta carrello:", err);
     res.status(500).json({ message: "Errore durante l'aggiunta nel carrello" });
+  }
+});
+// ACQUISTA
+app.post('/acquista', async (req, res) => {
+  try {
+    const { nome: nomeUtente, password } = req.body;
+    const result = await Cliente.findOne({ nome: nomeUtente, password });
+
+    if (!result) {
+      return res.status(401).json({ message: 'Credenziali non valide' });
+    }
+
+    const carrello = await Carrello.find({ nome: nomeUtente });
+    if (carrello.length === 0) {
+      return res.json({ message: "Il carrello dell'utente è vuoto" });
+    }
+
+    const prodottiAcquisiti = await Promise.all(
+      carrello.map(async (operaCarrello) => {
+        const operaDettagli = await Carrello.findOne({ codice: operaCarrello.codice });
+        return operaDettagli
+          ? { codice: operaDettagli.codice, prezzo: operaDettagli.prezzo, quantita: 1 }
+          : null;
+      })
+    );
+
+    const validi = prodottiAcquisiti.filter(Boolean);
+    let somma = 0;
+    validi.forEach(p => { somma += Math.floor(Number(p.prezzo || 0)); });
+
+    const ordineEffettuato = new Ordine({
+      id: Math.floor(Math.random() * 100000),
+      utente: nomeUtente,
+      data: getCurrentDate(),
+      prezzo: somma.toFixed(2),
+      prodottiAcquistati: validi
+    });
+
+    const resultOrdine = await ordineEffettuato.save();
+
+    const messaggi = validi.map((opera) => `Hai acquistato l'opera con codice: ${opera.codice} al prezzo di ${opera.prezzo}`);
+    const alertMessage = 'Grazie per aver acquistato da noi. Il tuo ordine è stato confermato.';
+    simulateSendSMS(result.numero, alertMessage, messaggi);
+
+    // Salvataggio sicuro nel file JSON strutturato
+    safeAppendToJsonFile(ordiniFilePath, ordineEffettuato);
+
+    // Svuota il carrello dell'utente dopo l'acquisto
+    await Carrello.deleteMany({ nome: nomeUtente });
+
+    // --- NUOVA LOGICA: RIMOZIONE DAL CATALOGO ---
+    if (fs.existsSync(opereFilePath)) {
+        let catalogo = JSON.parse(fs.readFileSync(opereFilePath, 'utf-8') || '[]');
+        
+        // Estrai tutti i codici dei prodotti acquistati
+        const codiciAcquistati = validi.map(p => p.codice);
+        
+        // Filtra il catalogo mantenendo solo le opere NON acquistate
+        const catalogoAggiornato = catalogo.filter(opera => !codiciAcquistati.includes(opera.codice));
+        
+        // Riscrivi il catalogo aggiornato
+        fs.writeFileSync(opereFilePath, JSON.stringify(catalogoAggiornato, null, 2), 'utf-8');
+        console.log(`Opere rimosse dal catalogo: ${codiciAcquistati.join(', ')}`);
+    }
+    // ---------------------------------------------
+
+    res.json({ message: alertMessage, ordine: resultOrdine });
+  } catch (error) {
+    console.error("Errore durante l'acquisto:", error);
+    res.status(500).json({ message: 'Errore durante la gestione della richiesta' });
   }
 });
 
@@ -203,17 +302,13 @@ app.post('/rimuoviCarrello', async (req, res) => {
     const result = await Carrello.findOne(condition);
 
     if (result) {
-      const deleteResult = await Carrello.deleteOne(condition);
-      if (deleteResult.deletedCount > 0) {
-        res.json({ message: 'Riepilogo opera eliminata:', nome: req.body.nome, codice: req.body.codice });
-      } else {
-        res.json({ message: 'Nessuna opera col codice corrispondente trovata per l\'eliminazione' });
-      }
+      await Carrello.deleteOne(condition);
+      res.json({ message: 'Riepilogo opera eliminata:', nome: req.body.nome, codice: req.body.codice });
     } else {
-      res.json({ message: 'Elemento non presente' });
+      res.status(404).json({ message: 'Elemento non presente nel carrello' });
     }
   } catch (error) {
-    console.error("Errore durante l'operazione", error);
+    console.error("Errore rimozione carrello:", error);
     res.status(500).json({ message: "Errore durante l'operazione" });
   }
 });
@@ -232,26 +327,13 @@ app.post('/visualizzaCarrello', async (req, res) => {
     if (carrello.length > 0) {
       res.json({ carrello });
     } else {
-      res.json({ message: "il carrello dell'utente è vuoto" });
+      res.json({ message: "Il carrello dell'utente è vuoto" });
     }
   } catch (error) {
-    console.error('Errore durante la gestione della richiesta', error);
+    console.error('Errore visualizzazione carrello:', error);
     res.status(500).json({ message: 'Errore durante la gestione della richiesta' });
   }
 });
-
-function simulateSendSMS(numeroUtente, smsMessage, messaggi) {
-  console.log('Simulazione SMS inviato a', numeroUtente, 'con il messaggio:', smsMessage);
-  console.log('Messaggi dettagliati:', messaggi);
-}
-
-function getCurrentDate() {
-  const today = new Date();
-  const year = today.getFullYear();
-  const month = String(today.getMonth() + 1).padStart(2, '0');
-  const day = String(today.getDate()).padStart(2, '0');
-  return `${year}-${month}-${day}`;
-}
 
 // ACQUISTA
 app.post('/acquista', async (req, res) => {
@@ -265,7 +347,7 @@ app.post('/acquista', async (req, res) => {
 
     const carrello = await Carrello.find({ nome: nomeUtente });
     if (carrello.length === 0) {
-      return res.json({ message: 'Il carrello dell\'utente è vuoto' });
+      return res.json({ message: "Il carrello dell'utente è vuoto" });
     }
 
     const prodottiAcquisiti = await Promise.all(
@@ -277,76 +359,65 @@ app.post('/acquista', async (req, res) => {
       })
     );
 
+    const validi = prodottiAcquisiti.filter(Boolean);
     let somma = 0;
-    for (const prodotto of prodottiAcquisiti) {
-      if (prodotto) somma += Math.floor(Number(prodotto.prezzo));
-    }
+    validi.forEach(p => { somma += Math.floor(Number(p.prezzo || 0)); });
 
     const ordineEffettuato = new Ordine({
-      id: Math.random() * 100,
+      id: Math.floor(Math.random() * 100000),
       utente: nomeUtente,
       data: getCurrentDate(),
       prezzo: somma.toFixed(2),
-      prodottiAcquistati: prodottiAcquisiti.filter(Boolean)
+      prodottiAcquistati: validi
     });
 
     const resultOrdine = await ordineEffettuato.save();
 
-    const messaggi = prodottiAcquisiti
-      .filter(Boolean)
-      .map((opera) => `Hai acquistato l'opera con codice: ${opera.codice} al prezzo di ${opera.prezzo}`);
-
+    const messaggi = validi.map((opera) => `Hai acquistato l'opera con codice: ${opera.codice} al prezzo di ${opera.prezzo}`);
     const alertMessage = 'Grazie per aver acquistato da noi. Il tuo ordine è stato confermato.';
     simulateSendSMS(result.numero, alertMessage, messaggi);
 
-    res.json({ message: alertMessage, ordine: resultOrdine });
+    // Salvataggio sicuro nel file JSON strutturato
+    safeAppendToJsonFile(ordiniFilePath, ordineEffettuato);
 
-    fs.appendFileSync('Ordini.json', JSON.stringify([ordineEffettuato], null, 2));
+    // Svuota il carrello dell'utente dopo l'acquisto
+    await Carrello.deleteMany({ nome: nomeUtente });
+
+    res.json({ message: alertMessage, ordine: resultOrdine });
   } catch (error) {
-    console.error('Errore durante la gestione della richiesta', error);
+    console.error('Errore durante l acquisto:', error);
     res.status(500).json({ message: 'Errore durante la gestione della richiesta' });
   }
 });
 
-// VENDI OPERA
-const vendiOpereFilePath = path.join(__dirname, 'VendiOpere.json');
+// VENDI OPERA (Proposta cliente)
 app.post('/VendiOpera', async (req, res) => {
   try {
     const newOpera = new VendiOpera(req.body);
     await newOpera.save();
 
-    const riepilogo = `OPERA REGISTRATA nomeCliente:${newOpera.nomeCliente} nome:${newOpera.nome} prezzo:${newOpera.prezzo}`;
-    res.json({ riepilogo });
-
-    let opere = [];
-    if (fs.existsSync(vendiOpereFilePath)) {
-      const leggifile = fs.readFileSync(vendiOpereFilePath, 'utf-8');
-      if (leggifile) opere = JSON.parse(leggifile);
-    }
-    opere.push(newOpera);
-    fs.writeFileSync(vendiOpereFilePath, JSON.stringify(opere, null, 2), 'utf-8');
+    safeAppendToJsonFile(vendiOpereFilePath, newOpera);
+    res.json({ riepilogo: `OPERA REGISTRATA nomeCliente:${newOpera.nomeCliente} nome:${newOpera.nome} prezzo:${newOpera.prezzo}` });
   } catch (error) {
-    console.error('Errore durante la registrazione/scrittura', error);
+    console.error('Errore durante la proposta di vendita:', error);
     res.status(500).json({ message: 'Errore durante la registrazione' });
   }
 });
 
 // VISUALIZZA OFFERTA
 app.get('/visualizzaOfferta', (req, res) => {
-  const visualizzaOpereFilePath = path.join(__dirname, 'Richieste.json');
   try {
-    const opere = JSON.parse(fs.readFileSync(visualizzaOpereFilePath, 'utf-8'));
+    if (!fs.existsSync(richiesteFilePath)) return res.json([]);
+    const opere = JSON.parse(fs.readFileSync(richiesteFilePath, 'utf-8') || '[]');
     res.json(opere);
   } catch (error) {
-    console.error('Errore durante la lettura del file:', error);
+    console.error('Errore lettura offerte:', error);
     res.status(500).json({ message: "Errore durante l'operazione di lettura del file" });
   }
 });
 
 // ACCETTA OFFERTA
 app.post('/accettaOfferta', async (req, res) => {
-  const offertaFilePath = path.join(__dirname, 'stato.json');
-
   const statiValidi = ['accetto', 'proponi', 'rifiuta'];
   if (!statiValidi.includes(req.body.stato)) {
     return res.status(400).json({ message: 'Lo stato fornito non è valido' });
@@ -356,32 +427,19 @@ app.post('/accettaOfferta', async (req, res) => {
     const newOfferta = new Offerta(req.body);
     await newOfferta.save();
 
-    const riepilogo = `OFFERTA REGISTRATA nomeCliente:${newOfferta.nomeCliente} nome:${newOfferta.nome} prezzo:${newOfferta.prezzo} stato:${newOfferta.stato}`;
-
     if (newOfferta.stato === 'accetto') {
-      const reportFilePath = path.join(__dirname, 'ReportVendite.json');
-      fs.appendFileSync(reportFilePath, JSON.stringify([newOfferta], null, 2), 'utf-8');
+      safeAppendToJsonFile(reportVenditeFilePath, newOfferta);
     }
 
-    res.json({ riepilogo });
-
-    let opere = [];
-    if (fs.existsSync(offertaFilePath)) {
-      const leggifile = fs.readFileSync(offertaFilePath, 'utf-8');
-      if (leggifile) opere = JSON.parse(leggifile);
-    }
-    opere.push(newOfferta);
-    fs.writeFileSync(offertaFilePath, JSON.stringify(opere, null, 2), 'utf-8');
+    safeAppendToJsonFile(statoFilePath, newOfferta);
+    res.json({ riepilogo: `OFFERTA REGISTRATA nomeCliente:${newOfferta.nomeCliente} nome:${newOfferta.nome} prezzo:${newOfferta.prezzo} stato:${newOfferta.stato}` });
   } catch (error) {
-    console.error('Errore durante la registrazione/scrittura', error);
+    console.error('Errore accettazione offerta:', error);
     res.status(500).json({ message: 'Errore durante la registrazione' });
   }
 });
 
-// ============================================================
-// Avvio server - una sola volta, alla fine del file
-// ============================================================
-const PORT = 3001;
-http.createServer(app).listen(PORT, () => {
-  console.log(`Server in ascolto sulla porta ${PORT}`);
+// Avvio nativo dell'applicazione Express
+app.listen(PORT, () => {
+  console.log(`Server Cliente in ascolto sulla porta ${PORT}`);
 });

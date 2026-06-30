@@ -4,21 +4,42 @@
  */
 
 document.addEventListener('DOMContentLoaded', () => {
+    console.log("App inizializzata correttamente.");
 
-    // --- GESTIONE TABS ---
+    // --- 1. GESTIONE LOGIN ---
+    const loginForm = document.getElementById('form-login-gestore');
+    loginForm?.addEventListener('submit', async (e) => {
+        e.preventDefault();
+        const username = document.getElementById('user').value;
+        const password = document.getElementById('pass').value;
+
+        try {
+            const res = await fetch('/loginGestore', {
+                method: 'POST',
+                headers: { 'Content-Type': 'application/json' },
+                body: JSON.stringify({ username, password })
+            });
+
+            if (res.ok) {
+                document.getElementById('login-overlay').classList.add('hidden');
+            } else {
+                alert("Credenziali errate!");
+            }
+        } catch (err) { alert("Errore di connessione al server."); }
+    });
+
+    // --- 2. GESTIONE TABS ---
     const tabButtons = document.querySelectorAll('.tab-btn');
     const tabContents = document.querySelectorAll('.tab-content');
 
     tabButtons.forEach(btn => {
         btn.addEventListener('click', () => {
-            // Rimuovi lo stato attivo da tutti i bottoni e nascondi i contenuti
             tabButtons.forEach(b => {
                 b.classList.remove('text-blue-600', 'border-b-2', 'border-blue-600', 'font-bold');
                 b.classList.add('text-slate-500', 'font-semibold');
             });
             tabContents.forEach(c => c.classList.add('hidden'));
 
-            // Attiva il bottone cliccato e mostra il suo contenuto
             btn.classList.remove('text-slate-500', 'font-semibold');
             btn.classList.add('text-blue-600', 'border-b-2', 'border-blue-600', 'font-bold');
             
@@ -27,8 +48,7 @@ document.addEventListener('DOMContentLoaded', () => {
         });
     });
 
-    // --- UTILITY FETCH ---
-    // Sostituisce il vecchio $.ajax
+    // --- 3. UTILITY FETCH ---
     async function sendData(url, method, dataObj) {
         try {
             const response = await fetch(url, {
@@ -38,62 +58,64 @@ document.addEventListener('DOMContentLoaded', () => {
             });
             return await response.json();
         } catch (error) {
-            console.error(`Errore in ${method} su ${url}:`, error);
-            alert("Si è verificato un errore di connessione col server.");
+            alert("Errore di connessione col server.");
             throw error;
         }
     }
 
-    // --- FORM SUBMIT HANDLERS ---
-
-    // 1. Aggiungi Opera
-    document.getElementById('form-aggiungi').addEventListener('submit', async (e) => {
-        e.preventDefault(); // Equivalente a return false
-        const formData = new FormData(e.target);
-        const data = Object.fromEntries(formData.entries());
-
-        const res = await sendData('/AggiungiOpera', 'POST', data);
-        console.log("Esito Aggiunta:", res);
-        alert(res.message || res.riepilogo || "Operazione completata");
-        e.target.reset(); // Svuota il form
-    });
-
-    // 2. Modifica Opera
-    document.getElementById('form-modifica').addEventListener('submit', async (e) => {
+    // --- 4. HANDLER FORMS ---
+    document.getElementById('form-aggiungi')?.addEventListener('submit', async (e) => {
         e.preventDefault();
-        const formData = new FormData(e.target);
-        const data = Object.fromEntries(formData.entries());
-
-        const res = await sendData('/ModificaOpera', 'POST', data);
-        console.log("Esito Modifica:", res);
-        alert(res.message || "Operazione completata");
+        const res = await sendData('/AggiungiOpera', 'POST', Object.fromEntries(new FormData(e.target)));
+        alert(res.message);
         e.target.reset();
     });
 
-    // 3. Rimuovi Opera
-    document.getElementById('form-rimuovi').addEventListener('submit', async (e) => {
+    document.getElementById('form-modifica')?.addEventListener('submit', async (e) => {
         e.preventDefault();
-        const formData = new FormData(e.target);
-        const data = Object.fromEntries(formData.entries());
-
-        const res = await sendData('/RimuoviOpera', 'POST', data);
-        console.log("Esito Rimozione:", res);
-        alert(res.message || "Operazione completata");
+        const res = await sendData('/ModificaOpera', 'POST', Object.fromEntries(new FormData(e.target)));
+        alert(res.message);
         e.target.reset();
     });
 
-    // --- BOTTONI REPORT E VISUALIZZAZIONI ---
-    const resultBox = document.getElementById('report-results');
+    document.getElementById('form-rimuovi')?.addEventListener('submit', async (e) => {
+        e.preventDefault();
+        const res = await sendData('/RimuoviOpera', 'POST', Object.fromEntries(new FormData(e.target)));
+        alert(res.message);
+        e.target.reset();
+    });
 
+    // --- 5. FETCH E DISPLAY TABELLA ---
     async function fetchAndDisplay(url) {
+        const resultBox = document.getElementById('report-results');
         try {
             const response = await fetch(url);
             const data = await response.json();
+            
             resultBox.classList.remove('hidden');
-            resultBox.innerHTML = `<pre>${JSON.stringify(data, null, 2)}</pre>`;
+            resultBox.innerHTML = data.length === 0 ? '<p class="p-4 text-slate-500">Nessun dato disponibile.</p>' : '';
+
+            if (data.length > 0) {
+                const table = document.createElement('table');
+                table.className = 'w-full text-left border-collapse';
+                
+                const headers = Object.keys(data[0]).filter(k => k !== '_id');
+                table.innerHTML = `<thead class="bg-slate-200"><tr>${headers.map(h => `<th class="p-2 border">${h.toUpperCase()}</th>`).join('')}</tr></thead>`;
+                
+                const tbody = document.createElement('tbody');
+                data.forEach(item => {
+                    const row = document.createElement('tr');
+                    row.className = 'border-b hover:bg-slate-50';
+                    row.innerHTML = headers.map(h => `<td class="p-2 border">${item[h] || '-'}</td>`).join('');
+                    tbody.appendChild(row);
+                });
+                
+                table.appendChild(tbody);
+                resultBox.appendChild(table);
+            }
         } catch (error) {
             console.error("Errore fetch dati:", error);
-            resultBox.innerHTML = "<span class='text-red-500'>Errore nel recupero dati.</span>";
+            resultBox.innerHTML = "<p class='text-red-500 p-4'>Errore nel recupero dati.</p>";
         }
     }
 
