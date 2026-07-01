@@ -100,5 +100,25 @@
     ],
     "_id": "6a43eafc4fc1783523f49c47",
     "__v": 0
+  },
+  {
+    "id": 42603,
+    "utente": "Francesco",
+    "data": "2026-07-01",
+    "prezzo": 100,
+    "prodottiAcquistati": [
+      {
+        "quantita": 1,
+        "_id": "6a453458296797e4b45f3a61"
+      },
+      {
+        "codice": "PR",
+        "prezzo": "100",
+        "quantita": 1,
+        "_id": "6a453458296797e4b45f3a62"
+      }
+    ],
+    "_id": "6a453458296797e4b45f3a60",
+    "__v": 0
   }
 ]

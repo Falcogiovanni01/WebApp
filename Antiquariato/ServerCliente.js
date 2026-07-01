@@ -154,6 +154,9 @@ app.post('/registrazione', async (req, res) => {
     res.status(500).json({ message: 'Errore durante la registrazione' });
   }
 });
+// ============================================================
+// ROTTE DI AUTENTICAZIONE E GESTIONE SESSIONE
+// ============================================================
 
 // LOGIN
 app.post('/login', async (req, res) => {
@@ -163,10 +166,10 @@ app.post('/login', async (req, res) => {
     if (result) {
       console.log('Accesso effettuato da:', nome);
 
-      // Scrittura del cookie di sessione
+      // Scrittura del cookie di sessione (FSM Stato S2)
       res.cookie('session', nome, {
         httpOnly: true,
-        maxAge: 1000 * 60 * 60 * 2 // 2 ore
+        maxAge: 1000 * 60 * 60 * 2 // Validità: 2 ore
       });
 
       res.json({ message: 'Accesso effettuato con successo', nome });
@@ -180,8 +183,18 @@ app.post('/login', async (req, res) => {
   }
 });
 
-// LOGOUT
-app.post('/logout', (req, res) => {
+// CHECK SESSION 
+app.get('/checkSessionCliente', (req, res) => {
+    const cookieHeader = req.headers.cookie;
+    if (cookieHeader && cookieHeader.includes('session=')) { 
+        res.json({ success: true, message: "Sessione client valida" });
+    } else {
+        res.status(401).json({ success: false, message: "Sessione non trovata" });
+    }
+});
+
+// LOGOUT 
+app.get('/logout', (req, res) => {
   res.clearCookie('session');
   res.json({ message: 'Logout effettuato con successo' });
 });

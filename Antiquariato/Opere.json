@@ -287,16 +287,68 @@
     "__v": 0
   },
   {
-    "codice": "PR",
-    "nome": "PR10",
-    "descrizione": "PR",
+    "codice": "PROVA_01",
+    "nome": "MODIFICA_RIUSCITA",
+    "descrizione": "bella prova",
+    "prezzo": "50",
+    "immagine1": [],
+    "immagine2": [],
+    "immagine3": [],
+    "immagine4": [],
+    "tecnica": "a mano",
+    "_id": "6a4533a8b5d8e8116737f2d0",
+    "__v": 0
+  },
+  {
+    "codice": "Opera_01",
+    "nome": "Spettacolare",
+    "descrizione": "è veramente uno spettacolo, fidatevi.",
     "prezzo": "100",
     "immagine1": [],
     "immagine2": [],
     "immagine3": [],
     "immagine4": [],
+    "tecnica": "macchina",
+    "_id": "6a453521b5d8e8116737f2db",
+    "__v": 0
+  },
+  {
+    "codice": "Opera_02",
+    "nome": "Castello",
+    "descrizione": "castello dei lego, prendetelo.",
+    "prezzo": "30",
+    "immagine1": [],
+    "immagine2": [],
+    "immagine3": [],
+    "immagine4": [],
+    "tecnica": "lego",
+    "_id": "6a453538b5d8e8116737f2dd",
+    "__v": 0
+  },
+  {
+    "codice": "Opera_03",
+    "nome": "Dragon ball",
+    "descrizione": "fumetto in vendita ep.3",
+    "prezzo": "5",
+    "immagine1": [],
+    "immagine2": [],
+    "immagine3": [],
+    "immagine4": [],
     "tecnica": "",
-    "_id": "6a43f41613cdb301c790e120",
+    "_id": "6a45354db5d8e8116737f2df",
+    "__v": 0
+  },
+  {
+    "codice": "Opera_04",
+    "nome": "Fumetto one piece",
+    "descrizione": "Episodio 01",
+    "prezzo": "1000",
+    "immagine1": [],
+    "immagine2": [],
+    "immagine3": [],
+    "immagine4": [],
+    "tecnica": "",
+    "_id": "6a453563b5d8e8116737f2e1",
     "__v": 0
   }
 ]

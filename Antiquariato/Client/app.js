@@ -1,5 +1,8 @@
-document.addEventListener('DOMContentLoaded', () => {
+/**
+ * Antiquariato Cliente - App Client Logic
+ */
 
+document.addEventListener('DOMContentLoaded', async () => {
     // --- SELETTORI DOM ---
     const authContainer = document.getElementById('auth-container');
     const appContainer = document.getElementById('main-app-container');
@@ -7,112 +10,57 @@ document.addEventListener('DOMContentLoaded', () => {
     const welcomeMsg = document.getElementById('welcome-msg');
     const formLogin = document.getElementById('form-login');
     const formRegister = document.getElementById('form-register');
-    
-    // --- GESTIONE STATO (Macchina a Stati) ---
-    function checkAuthState() {
-        const userData = sessionStorage.getItem('user');
-        if (userData) {
-            // STATO: LOGGATO
-            const user = JSON.parse(userData);
-            authContainer.classList.add('hidden');
-            appContainer.classList.remove('hidden');
-            userInfo.classList.remove('hidden');
-            welcomeMsg.textContent = `Ciao, ${user.nome}`;
-            loadCatalog(); // Carica i dati appena entra
-        } else {
-            // STATO: OSPITE (NON LOGGATO)
-            authContainer.classList.remove('hidden');
-            appContainer.classList.add('hidden');
-            userInfo.classList.add('hidden');
+
+    // --- S0: VERIFICA SESSIONE (Integrazione Server/Client) ---
+    async function checkAuthState() {
+        // Proviamo a vedere se il server riconosce il cookie
+        try {
+            const response = await fetch('/checkSessionCliente');
+            const userData = localStorage.getItem('user'); // Usiamo localStorage!
+
+            if (response.ok && userData) {
+                // STATO: LOGGATO
+                const user = JSON.parse(userData);
+                authContainer.classList.add('hidden');
+                appContainer.classList.remove('hidden');
+                userInfo.classList.remove('hidden');
+                welcomeMsg.textContent = `Ciao, ${user.nome}`;
+                loadCatalog();
+            } else {
+                // STATO: NON LOGGATO
+                authContainer.classList.remove('hidden');
+                appContainer.classList.add('hidden');
+                userInfo.classList.add('hidden');
+            }
+        } catch (err) {
+            console.error("Errore verifica sessione:", err);
         }
     }
 
-    // --- NAVIGAZIONE TABS CLIENTE ---
-    const tabButtons = document.querySelectorAll('.client-tab');
-    const tabContents = document.querySelectorAll('.client-content');
-
-    tabButtons.forEach(btn => {
-        btn.addEventListener('click', () => {
-            tabButtons.forEach(b => {
-                b.classList.remove('text-blue-700', 'border-b-2', 'border-blue-600', 'font-bold');
-                b.classList.add('text-slate-500', 'font-semibold');
-            });
-            tabContents.forEach(c => c.classList.add('hidden'));
-
-            btn.classList.remove('text-slate-500', 'font-semibold');
-            btn.classList.add('text-blue-700', 'border-b-2', 'border-blue-600', 'font-bold');
-            
-            const targetId = btn.getAttribute('data-target');
-            document.getElementById(targetId).classList.remove('hidden');
-
-            // Azioni specifiche per tab
-            if(targetId === 'tab-carrello') loadCart();
-            if(targetId === 'tab-catalogo') loadCatalog();
-        });
-    });
-
-    // --- SWITCH LOGIN / REGISTRAZIONE ---
-    document.getElementById('link-show-register').addEventListener('click', (e) => {
-        e.preventDefault();
-        formLogin.classList.add('hidden');
-        formRegister.classList.remove('hidden');
-    });
-
-    document.getElementById('link-show-login').addEventListener('click', (e) => {
-        e.preventDefault();
-        formRegister.classList.add('hidden');
-        formLogin.classList.remove('hidden');
-    });
-
-    // --- CHIAMATE API (FETCH) ---
-    
-    // Login
+    // --- LOGIN ---
     formLogin.addEventListener('submit', async (e) => {
         e.preventDefault();
         const data = Object.fromEntries(new FormData(e.target).entries());
-
         try {
             const response = await fetch('/login', {
                 method: 'POST',
                 headers: { 'Content-Type': 'application/x-www-form-urlencoded' },
                 body: new URLSearchParams(data).toString()
             });
-            const result = await response.json();
-            
             if (response.ok) {
-                // Salvo i dati in sessione (nome e password servono al server per il carrello)
-                sessionStorage.setItem('user', JSON.stringify(data));
+                // Salvo su localStorage, NON sessionStorage
+                localStorage.setItem('user', JSON.stringify(data));
                 checkAuthState();
             } else {
-                alert(result.message || "Credenziali errate");
+                alert("Credenziali errate");
             }
-        } catch (error) {
-            console.error("Errore Login:", error);
-        }
+        } catch (error) { console.error("Errore Login:", error); }
     });
 
-    // Registrazione
-    formRegister.addEventListener('submit', async (e) => {
-        e.preventDefault();
-        const data = Object.fromEntries(new FormData(e.target).entries());
-
-        try {
-            const response = await fetch('/registrazione', {
-                method: 'POST',
-                headers: { 'Content-Type': 'application/x-www-form-urlencoded' },
-                body: new URLSearchParams(data).toString()
-            });
-            const result = await response.json();
-            alert("Registrazione completata! Ora puoi effettuare il login.");
-            document.getElementById('link-show-login').click(); // Torna al login
-        } catch (error) {
-            console.error("Errore Registrazione:", error);
-        }
-    });
-
-    // Logout
-    document.getElementById('btn-logout').addEventListener('click', () => {
-        sessionStorage.removeItem('user');
+    // --- LOGOUT ---
+    document.getElementById('btn-logout').addEventListener('click', async () => {
+        await fetch('/logout'); 
+        localStorage.removeItem('user');
         checkAuthState();
     });
 
@@ -227,32 +175,13 @@ document.addEventListener('DOMContentLoaded', () => {
             });
             const result = await response.json();
             alert(result.message || "Acquisto confermato!");
-            loadCart(); // Ricarica (dovrebbe essere vuoto se gestito dal server)
+            loadCart(); // Ricarica 
         } catch (error) {
             console.error("Errore acquisto:", error);
         }
     });
 
-    // Proponi Vendita
-    document.getElementById('form-vendi').addEventListener('submit', async (e) => {
-        e.preventDefault();
-        const user = JSON.parse(sessionStorage.getItem('user'));
-        const data = Object.fromEntries(new FormData(e.target).entries());
-        data.nomeCliente = user.nome; // Inietto il nome dell'utente loggato
-
-        try {
-            const response = await fetch('/VendiOpera', {
-                method: 'POST',
-                headers: { 'Content-Type': 'application/json' },
-                body: JSON.stringify(data)
-            });
-            const result = await response.json();
-            alert(result.riepilogo || "Proposta inviata con successo!");
-            e.target.reset();
-        } catch (error) {
-            console.error("Errore proposta vendita:", error);
-        }
-    });
+   
 
     // --- INIZIALIZZAZIONE ---
     checkAuthState();

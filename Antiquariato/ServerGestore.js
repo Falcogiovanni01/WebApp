@@ -69,12 +69,11 @@ function logAction(action, details) {
 }
 
 // --- ROTTE API ---
-// Login Gestore
+// ... codice precedente ...
+
 app.post('/loginGestore', (req, res) => {
     const { username, password } = req.body;
-    
     if (username === ADMIN_USER && password === ADMIN_PASS) {
-        // Scriviamo il cookie nativamente come nel Cliente
         res.cookie('gestoreSession', 'admin', {
             httpOnly: true,
             maxAge: 1000 * 60 * 60 * 2 // 2 ore
@@ -82,6 +81,17 @@ app.post('/loginGestore', (req, res) => {
         res.json({ success: true });
     } else {
         res.status(401).json({ success: false, message: "Accesso negato" });
+    }
+});
+
+// Endpoint per verificare lo stato della sessione
+app.get('/checkSession', (req, res) => {
+    // Controlliamo se nella richiesta c'è l'header del cookie con la nostra sessione
+    const cookieHeader = req.headers.cookie;
+    if (cookieHeader && cookieHeader.includes('gestoreSession=admin')) {
+        res.json({ success: true, message: "Sessione attiva" });
+    } else {
+        res.status(401).json({ success: false, message: "Nessuna sessione" });
     }
 });
 

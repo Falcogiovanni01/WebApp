@@ -44,7 +44,6 @@
             <nav class="flex border-b bg-slate-100" id="client-tabs">
                 <button data-target="tab-catalogo" class="client-tab flex-1 py-4 text-center font-bold text-blue-700 border-b-2 border-blue-600">Catalogo Opere</button>
                 <button data-target="tab-carrello" class="client-tab flex-1 py-4 text-center font-semibold text-slate-500 hover:bg-slate-200">Il Mio Carrello</button>
-                <button data-target="tab-vendi" class="client-tab flex-1 py-4 text-center font-semibold text-slate-500 hover:bg-slate-200">Proponi un'Opera</button>
             </nav>
 
             <div class="p-6">
@@ -61,15 +60,7 @@
                     <button id="btn-acquista" data-testid="btn-acquista" class="w-full bg-green-600 text-white p-3 rounded font-bold hover:bg-green-700 hidden">Procedi all'Acquisto</button>
                 </section>
 
-                <section id="tab-vendi" class="client-content hidden">
-                    <h2 class="text-2xl font-bold mb-4">Proponi un'Opera alla Galleria</h2>
-                    <form id="form-vendi" class="flex flex-col gap-4 max-w-lg">
-                        <input type="text" name="nome" placeholder="Nome dell'Opera" required class="border p-2 rounded">
-                        <textarea name="descrizione" placeholder="Breve descrizione" rows="3" class="border p-2 rounded"></textarea>
-                        <input type="number" name="prezzo" placeholder="Prezzo Desiderato (€)" required class="border p-2 rounded">
-                        <button type="submit" data-testid="btn-proponi-vendita" class="bg-blue-600 text-white p-2 rounded font-bold hover:bg-blue-700">Invia Proposta</button>
-                    </form>
-                </section>
+               
             </div>
         </div>
 
