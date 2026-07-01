@@ -390,54 +390,54 @@ app.post('/acquista', async (req, res) => {
   }
 });
 
-// VENDI OPERA (Proposta cliente)
-app.post('/VendiOpera', async (req, res) => {
-  try {
-    const newOpera = new VendiOpera(req.body);
-    await newOpera.save();
+// // VENDI OPERA (Proposta cliente)
+// app.post('/VendiOpera', async (req, res) => {
+//   try {
+//     const newOpera = new VendiOpera(req.body);
+//     await newOpera.save();
 
-    safeAppendToJsonFile(vendiOpereFilePath, newOpera);
-    res.json({ riepilogo: `OPERA REGISTRATA nomeCliente:${newOpera.nomeCliente} nome:${newOpera.nome} prezzo:${newOpera.prezzo}` });
-  } catch (error) {
-    console.error('Errore durante la proposta di vendita:', error);
-    res.status(500).json({ message: 'Errore durante la registrazione' });
-  }
-});
+//     safeAppendToJsonFile(vendiOpereFilePath, newOpera);
+//     res.json({ riepilogo: `OPERA REGISTRATA nomeCliente:${newOpera.nomeCliente} nome:${newOpera.nome} prezzo:${newOpera.prezzo}` });
+//   } catch (error) {
+//     console.error('Errore durante la proposta di vendita:', error);
+//     res.status(500).json({ message: 'Errore durante la registrazione' });
+//   }
+// });
 
-// VISUALIZZA OFFERTA
-app.get('/visualizzaOfferta', (req, res) => {
-  try {
-    if (!fs.existsSync(richiesteFilePath)) return res.json([]);
-    const opere = JSON.parse(fs.readFileSync(richiesteFilePath, 'utf-8') || '[]');
-    res.json(opere);
-  } catch (error) {
-    console.error('Errore lettura offerte:', error);
-    res.status(500).json({ message: "Errore durante l'operazione di lettura del file" });
-  }
-});
+// // VISUALIZZA OFFERTA
+// app.get('/visualizzaOfferta', (req, res) => {
+//   try {
+//     if (!fs.existsSync(richiesteFilePath)) return res.json([]);
+//     const opere = JSON.parse(fs.readFileSync(richiesteFilePath, 'utf-8') || '[]');
+//     res.json(opere);
+//   } catch (error) {
+//     console.error('Errore lettura offerte:', error);
+//     res.status(500).json({ message: "Errore durante l'operazione di lettura del file" });
+//   }
+// });
 
-// ACCETTA OFFERTA
-app.post('/accettaOfferta', async (req, res) => {
-  const statiValidi = ['accetto', 'proponi', 'rifiuta'];
-  if (!statiValidi.includes(req.body.stato)) {
-    return res.status(400).json({ message: 'Lo stato fornito non è valido' });
-  }
+// // ACCETTA OFFERTA
+// app.post('/accettaOfferta', async (req, res) => {
+//   const statiValidi = ['accetto', 'proponi', 'rifiuta'];
+//   if (!statiValidi.includes(req.body.stato)) {
+//     return res.status(400).json({ message: 'Lo stato fornito non è valido' });
+//   }
 
-  try {
-    const newOfferta = new Offerta(req.body);
-    await newOfferta.save();
+//   try {
+//     const newOfferta = new Offerta(req.body);
+//     await newOfferta.save();
 
-    if (newOfferta.stato === 'accetto') {
-      safeAppendToJsonFile(reportVenditeFilePath, newOfferta);
-    }
+//     if (newOfferta.stato === 'accetto') {
+//       safeAppendToJsonFile(reportVenditeFilePath, newOfferta);
+//     }
 
-    safeAppendToJsonFile(statoFilePath, newOfferta);
-    res.json({ riepilogo: `OFFERTA REGISTRATA nomeCliente:${newOfferta.nomeCliente} nome:${newOfferta.nome} prezzo:${newOfferta.prezzo} stato:${newOfferta.stato}` });
-  } catch (error) {
-    console.error('Errore accettazione offerta:', error);
-    res.status(500).json({ message: 'Errore durante la registrazione' });
-  }
-});
+//     safeAppendToJsonFile(statoFilePath, newOfferta);
+//     res.json({ riepilogo: `OFFERTA REGISTRATA nomeCliente:${newOfferta.nomeCliente} nome:${newOfferta.nome} prezzo:${newOfferta.prezzo} stato:${newOfferta.stato}` });
+//   } catch (error) {
+//     console.error('Errore accettazione offerta:', error);
+//     res.status(500).json({ message: 'Errore durante la registrazione' });
+//   }
+// });
 
 // Avvio nativo dell'applicazione Express
 app.listen(PORT, () => {
