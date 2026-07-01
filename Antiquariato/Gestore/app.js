@@ -1,10 +1,22 @@
 /**
  * Antiquariato Gestore - App Client Logic
- * Modernized: Vanilla JS, Fetch API, Async/Await
+ * Versione completa e aggiornata con gestione sessione (FSM)
  */
 
-document.addEventListener('DOMContentLoaded', () => {
+document.addEventListener('DOMContentLoaded', async () => {
     console.log("App inizializzata correttamente.");
+
+    // --- S0: VERIFICA SESSIONE ATTIVA ---
+    try {
+        const sessionCheck = await fetch('/checkSession');
+        if (sessionCheck.ok) {
+            // Stato S0 -> S2: Utente già autenticato, nascondi l'overlay
+            document.getElementById('login-overlay').classList.add('hidden');
+            console.log("Sessione ripristinata dal server.");
+        }
+    } catch (err) {
+        console.log("Nessuna sessione attiva, resto nello stato S1 (Login).");
+    }
 
     // --- 1. GESTIONE LOGIN ---
     const loginForm = document.getElementById('form-login-gestore');
@@ -28,6 +40,18 @@ document.addEventListener('DOMContentLoaded', () => {
         } catch (err) { alert("Errore di connessione al server."); }
     });
 
+    // --- 1.5 GESTIONE LOGOUT ---
+    document.getElementById('btn-logout-gestore')?.addEventListener('click', async () => {
+        try {
+            await fetch('/logoutGestore');
+            document.getElementById('login-overlay').classList.remove('hidden');
+            document.getElementById('form-login-gestore').reset();
+            console.log("Logout effettuato, tornato alla schermata di accesso.");
+        } catch (err) {
+            console.error("Errore durante il logout:", err);
+        }
+    });
+
     // --- 2. GESTIONE TABS ---
     const tabButtons = document.querySelectorAll('.tab-btn');
     const tabContents = document.querySelectorAll('.tab-content');
@@ -48,41 +72,48 @@ document.addEventListener('DOMContentLoaded', () => {
         });
     });
 
-    // --- 3. UTILITY FETCH ---
+    // --- 3. UTILITY FETCH ROBUSTA ---
     async function sendData(url, method, dataObj) {
-        try {
-            const response = await fetch(url, {
-                method: method,
-                headers: { 'Content-Type': 'application/json' },
-                body: JSON.stringify(dataObj)
-            });
-            return await response.json();
-        } catch (error) {
-            alert("Errore di connessione col server.");
-            throw error;
+        const response = await fetch(url, {
+            method: method,
+            headers: { 'Content-Type': 'application/json' },
+            body: JSON.stringify(dataObj)
+        });
+
+        if (!response.ok) {
+            const errorData = await response.json();
+            throw new Error(errorData.message || "Errore del server");
         }
+        
+        return await response.json();
     }
 
     // --- 4. HANDLER FORMS ---
     document.getElementById('form-aggiungi')?.addEventListener('submit', async (e) => {
         e.preventDefault();
-        const res = await sendData('/AggiungiOpera', 'POST', Object.fromEntries(new FormData(e.target)));
-        alert(res.message);
-        e.target.reset();
+        try {
+            const res = await sendData('/AggiungiOpera', 'POST', Object.fromEntries(new FormData(e.target)));
+            alert(res.message);
+            e.target.reset();
+        } catch (err) { alert(err.message); }
     });
 
     document.getElementById('form-modifica')?.addEventListener('submit', async (e) => {
         e.preventDefault();
-        const res = await sendData('/ModificaOpera', 'POST', Object.fromEntries(new FormData(e.target)));
-        alert(res.message);
-        e.target.reset();
+        try {
+            const res = await sendData('/ModificaOpera', 'POST', Object.fromEntries(new FormData(e.target)));
+            alert(res.message);
+            e.target.reset();
+        } catch (err) { alert(err.message); }
     });
 
     document.getElementById('form-rimuovi')?.addEventListener('submit', async (e) => {
         e.preventDefault();
-        const res = await sendData('/RimuoviOpera', 'POST', Object.fromEntries(new FormData(e.target)));
-        alert(res.message);
-        e.target.reset();
+        try {
+            const res = await sendData('/RimuoviOpera', 'POST', Object.fromEntries(new FormData(e.target)));
+            alert(res.message);
+            e.target.reset();
+        } catch (err) { alert(err.message); }
     });
 
     // --- 5. FETCH E DISPLAY TABELLA ---

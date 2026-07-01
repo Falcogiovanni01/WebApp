@@ -94,6 +94,11 @@ app.get('/checkSession', (req, res) => {
         res.status(401).json({ success: false, message: "Nessuna sessione" });
     }
 });
+app.get('/logoutGestore', (req, res) => {
+    // Elimina il cookie del gestore
+    res.clearCookie('gestoreSession');
+    res.json({ success: true, message: "Logout effettuato con successo" });
+});
 
 
 app.get('/AggiuntaOpera', (req, res) => {
@@ -193,30 +198,6 @@ app.post('/RimuoviOpera', async (req, res) => {
 });
 
 
-
-// Rimuovi Opera
-app.post('/RimuoviOpera', async (req, res) => {
-    try {
-        const conditions = { codice: req.body.codice, nome: req.body.nome };
-        const result = await Opera.findOne(conditions);
-        
-        if (!result) {
-            console.log('Elemento non presente');
-            return res.status(404).json({ message: 'Elemento non presente' });
-        }
-
-        const deleteResult = await Opera.deleteOne(conditions);
-        if (deleteResult.deletedCount > 0) {
-            console.log('Eliminazione avvenuta con successo');
-            res.json({ message: 'Riepilogo opera eliminata:', data: result });
-        } else {
-            res.json({ message: "Errore durante l'eliminazione" });
-        }
-    } catch (error) {
-        console.error('Errore durante la rimozione:', error);
-        res.status(500).json({ message: "Errore durante l'operazione" });
-    }
-});
 
 // Visualizza Opere inserite dai Clienti
 app.get('/visualizzaOpere', (req, res) => {
