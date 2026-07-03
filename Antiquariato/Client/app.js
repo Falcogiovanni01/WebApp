@@ -37,6 +37,42 @@ document.addEventListener('DOMContentLoaded', async () => {
         }
     }
 
+       // --- SWITCH LOGIN / REGISTRAZIONE ---
+    document.getElementById('link-show-register').addEventListener('click', (e) => {
+        e.preventDefault();
+        formLogin.classList.add('hidden');
+        formRegister.classList.remove('hidden');
+    });
+
+    document.getElementById('link-show-login').addEventListener('click', (e) => {
+        e.preventDefault();
+        formRegister.classList.add('hidden');
+        formLogin.classList.remove('hidden');
+    });
+
+       // --- NAVIGAZIONE TAB ---
+    const tabButtons = document.querySelectorAll('.client-tab');
+    const tabContents = document.querySelectorAll('.client-content');
+ 
+    tabButtons.forEach(btn => {
+        btn.addEventListener('click', () => {
+            tabButtons.forEach(b => {
+                b.classList.remove('text-blue-700', 'border-b-2', 'border-blue-600', 'font-bold');
+                b.classList.add('text-slate-500', 'font-semibold');
+            });
+            tabContents.forEach(c => c.classList.add('hidden'));
+ 
+            btn.classList.remove('text-slate-500', 'font-semibold');
+            btn.classList.add('text-blue-700', 'border-b-2', 'border-blue-600', 'font-bold');
+ 
+            const targetId = btn.getAttribute('data-target');
+            document.getElementById(targetId).classList.remove('hidden');
+ 
+            if (targetId === 'tab-carrello') loadCart();
+            if (targetId === 'tab-catalogo') loadCatalog();
+        });
+    });
+
     // --- LOGIN ---
     formLogin.addEventListener('submit', async (e) => {
         e.preventDefault();
@@ -55,6 +91,32 @@ document.addEventListener('DOMContentLoaded', async () => {
                 alert("Credenziali errate");
             }
         } catch (error) { console.error("Errore Login:", error); }
+    });
+
+    // --- REGISTRAZIONE ---
+    formRegister.addEventListener('submit', async (e) => {
+        e.preventDefault();
+        const data = Object.fromEntries(new FormData(e.target).entries());
+
+        try {
+            const response = await fetch('/registrazione', {
+                method: 'POST',
+                headers: { 'Content-Type': 'application/x-www-form-urlencoded' },
+                body: new URLSearchParams(data).toString()
+            });
+            
+            if (response.ok) {
+                alert("Registrazione completata! Ora puoi effettuare il login.");
+                document.getElementById('link-show-login').click(); 
+                formRegister.reset(); // Pulisce i campi del form
+            } else {
+                const result = await response.json();
+                alert(result.message || "Errore durante la registrazione.");
+            }
+        } catch (error) {
+            console.error("Errore Registrazione:", error);
+            alert("Errore di connessione al server.");
+        }
     });
 
     // --- LOGOUT ---
@@ -97,7 +159,7 @@ document.addEventListener('DOMContentLoaded', async () => {
 
     // Aggiungi al Carrello (Messa nel window per poterla chiamare dall'onclick dell'HTML generato)
     window.addToCart = async function(codice) {
-        const user = JSON.parse(sessionStorage.getItem('user'));
+        const user = JSON.parse(localStorage.getItem('user'));
         try {
             const response = await fetch('/aggiungiCarrello', {
                 method: 'POST',
@@ -113,7 +175,7 @@ document.addEventListener('DOMContentLoaded', async () => {
 
     // Carica Carrello
     async function loadCart() {
-        const user = JSON.parse(sessionStorage.getItem('user'));
+        const user = JSON.parse(localStorage.getItem('user'));
         const cartList = document.getElementById('cart-list');
         const btnAcquista = document.getElementById('btn-acquista');
         
@@ -151,7 +213,7 @@ document.addEventListener('DOMContentLoaded', async () => {
 
     // Rimuovi dal Carrello
     window.removeFromCart = async function(codice) {
-        const user = JSON.parse(sessionStorage.getItem('user'));
+        const user = JSON.parse(localStorage.getItem('user'));
         try {
             await fetch('/rimuoviCarrello', {
                 method: 'POST',
@@ -166,7 +228,7 @@ document.addEventListener('DOMContentLoaded', async () => {
 
     // Procedi all'acquisto
     document.getElementById('btn-acquista').addEventListener('click', async () => {
-        const user = JSON.parse(sessionStorage.getItem('user'));
+        const user = JSON.parse(localStorage.getItem('user'));
         try {
             const response = await fetch('/acquista', {
                 method: 'POST',

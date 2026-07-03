@@ -45,13 +45,13 @@ const OperaSchema = new mongoose.Schema({
 });
 const Opera = mongoose.model('Opera', OperaSchema);
 
-const VendiOperaSchema = new mongoose.Schema({
+/*const VendiOperaSchema = new mongoose.Schema({
     nomeCliente: String,
     nome: String,
     prezzoVendita: String
 });
 const VendiOpera = mongoose.model('VendiOpera', VendiOperaSchema);
-
+*/
 // File Paths relativi e sicuri
 const opereFilePath = path.join(__dirname, 'Opere.json');
 const richiesteFilePath = path.join(__dirname, 'Richieste.json');
@@ -68,9 +68,17 @@ function logAction(action, details) {
     });
 }
 
-// --- ROTTE API ---
-// ... codice precedente ...
+// MIDDLEWARE DI AUTENTICAZIONE
+function requireAuth(req, res, next) {
+    const cookieHeader = req.headers.cookie;
+    if (cookieHeader && cookieHeader.includes('gestoreSession=admin')) {
+        return next(); // Il cookie è valido, passa l'esecuzione alla rotta
+    }
+    // Cookie assente o non valido: blocca la richiesta
+    res.status(401).json({ success: false, message: "Accesso negato: autenticazione richiesta" });
+}
 
+// --- ROTTE API ---
 app.post('/loginGestore', (req, res) => {
     const { username, password } = req.body;
     if (username === ADMIN_USER && password === ADMIN_PASS) {
@@ -101,12 +109,13 @@ app.get('/logoutGestore', (req, res) => {
 });
 
 
-app.get('/AggiuntaOpera', (req, res) => {
+
+app.get('/AggiuntaOpera', requireAuth, (req, res) => {
     res.send('Endpoint temporaneo per lo sviluppo.');
 });
 
 // Aggiungi Opera
-app.post('/AggiungiOpera', async (req, res) => {
+app.post('/AggiungiOpera',requireAuth,  async (req, res) => {
     try {
         console.log('Ricevuto:', req.body);
         const newOpera = new Opera({ ...req.body });
@@ -131,7 +140,7 @@ app.post('/AggiungiOpera', async (req, res) => {
 });
 
 // Modifica Opera
-app.post('/ModificaOpera', async (req, res) => {
+app.post('/ModificaOpera', requireAuth,  async (req, res) => {
     try {
         // FIX: Cerchiamo SOLO per codice. Il nome può essere cambiato dall'utente!
         const condition = { codice: req.body.codice };
@@ -165,7 +174,7 @@ app.post('/ModificaOpera', async (req, res) => {
 });
 
 // Rimuovi Opera
-app.post('/RimuoviOpera', async (req, res) => {
+app.post('/RimuoviOpera', requireAuth, async (req, res) => {
     try {
         // FIX: Cerchiamo SOLO per codice per non rischiare errori di battitura sul nome
         const condition = { codice: req.body.codice };
@@ -200,7 +209,7 @@ app.post('/RimuoviOpera', async (req, res) => {
 
 
 // Visualizza Opere inserite dai Clienti
-app.get('/visualizzaOpere', (req, res) => {
+/*app.get('/visualizzaOpere', requireAuth, (req, res) => {
     try {
         if (!fs.existsSync(richiesteFilePath)) return res.json([]);
         const leggiFile = fs.readFileSync(richiesteFilePath, 'utf-8');
@@ -210,10 +219,10 @@ app.get('/visualizzaOpere', (req, res) => {
         console.error('Errore lettura richieste:', error);
         res.status(500).json({ message: 'Errore di lettura' });
     }
-});
+}); */
 
 // Report Acquisti Effettuati dai Clienti (Risolto bug di riferimento oggetti)
-app.get('/reportAcquisti', (req, res) => {
+app.get('/reportAcquisti', requireAuth, (req, res) => {
     try {
         if (!fs.existsSync(ordiniFilePath)) return res.json([]);
         const leggiFile = fs.readFileSync(ordiniFilePath, 'utf-8');
@@ -240,7 +249,7 @@ app.get('/reportAcquisti', (req, res) => {
 });
 
 // Gestione Proposta di Vendita del Cliente
-app.post('/VendiOpera', async (req, res) => {
+app.post('/VendiOpera', requireAuth, async (req, res) => {
     try {
         console.log(req.body);
         const newOpera = new VendiOpera({
@@ -266,7 +275,7 @@ app.post('/VendiOpera', async (req, res) => {
 });
 
 // Visualizza Scelte ed Esiti degli Stati
-app.get('/visualizzaSceltaClient', (req, res) => {
+app.get('/visualizzaSceltaClient', requireAuth, (req, res) => {
     try {
         if (!fs.existsSync(statoFilePath)) return res.json([]);
         const leggiFile = fs.readFileSync(statoFilePath, 'utf-8');
@@ -279,7 +288,7 @@ app.get('/visualizzaSceltaClient', (req, res) => {
 });
 
 // Report delle Vendite Accettate (Risolto bug di riferimento e proprietà non corrispondenti)
-app.get('/reportVendite', (req, res) => {
+app.get('/reportVendite', requireAuth, (req, res) => {
     try {
         if (!fs.existsSync(reportVenditeFilePath)) return res.json([]);
         const leggiFile = fs.readFileSync(reportVenditeFilePath, 'utf-8');

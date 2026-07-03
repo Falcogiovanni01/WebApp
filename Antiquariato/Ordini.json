@@ -120,5 +120,21 @@
     ],
     "_id": "6a453458296797e4b45f3a60",
     "__v": 0
+  },
+  {
+    "id": 34555,
+    "utente": "Gio",
+    "data": "2026-07-02",
+    "prezzo": 1000,
+    "prodottiAcquistati": [
+      {
+        "codice": "Opera_04",
+        "prezzo": "1000",
+        "quantita": 1,
+        "_id": "6a466f8661e33f95af87d2ec"
+      }
+    ],
+    "_id": "6a466f8661e33f95af87d2eb",
+    "__v": 0
   }
 ]

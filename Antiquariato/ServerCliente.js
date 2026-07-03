@@ -161,7 +161,7 @@ app.post('/registrazione', async (req, res) => {
 // LOGIN
 app.post('/login', async (req, res) => {
   const { nome, password } = req.body;
-  try {
+// try {
     const result = await LoginCliente.findOne({ nome, password });
     if (result) {
       console.log('Accesso effettuato da:', nome);
@@ -177,10 +177,11 @@ app.post('/login', async (req, res) => {
       console.log('Credenziali non valide');
       res.status(401).json({ message: 'Credenziali non valide' });
     }
-  } catch (err) {
+ // } 
+ /* catch (err) {
     console.error('Errore durante il login:', err);
     res.status(500).json({ message: 'Errore durante il login' });
-  }
+  }*/
 });
 
 // CHECK SESSION 
@@ -349,59 +350,6 @@ app.post('/visualizzaCarrello', async (req, res) => {
 });
 
 // ACQUISTA
-app.post('/acquista', async (req, res) => {
-  try {
-    const { nome: nomeUtente, password } = req.body;
-    const result = await Cliente.findOne({ nome: nomeUtente, password });
-
-    if (!result) {
-      return res.status(401).json({ message: 'Credenziali non valide' });
-    }
-
-    const carrello = await Carrello.find({ nome: nomeUtente });
-    if (carrello.length === 0) {
-      return res.json({ message: "Il carrello dell'utente è vuoto" });
-    }
-
-    const prodottiAcquisiti = await Promise.all(
-      carrello.map(async (operaCarrello) => {
-        const operaDettagli = await Carrello.findOne({ codice: operaCarrello.codice });
-        return operaDettagli
-          ? { codice: operaDettagli.codice, prezzo: operaDettagli.prezzo, quantita: 1 }
-          : null;
-      })
-    );
-
-    const validi = prodottiAcquisiti.filter(Boolean);
-    let somma = 0;
-    validi.forEach(p => { somma += Math.floor(Number(p.prezzo || 0)); });
-
-    const ordineEffettuato = new Ordine({
-      id: Math.floor(Math.random() * 100000),
-      utente: nomeUtente,
-      data: getCurrentDate(),
-      prezzo: somma.toFixed(2),
-      prodottiAcquistati: validi
-    });
-
-    const resultOrdine = await ordineEffettuato.save();
-
-    const messaggi = validi.map((opera) => `Hai acquistato l'opera con codice: ${opera.codice} al prezzo di ${opera.prezzo}`);
-    const alertMessage = 'Grazie per aver acquistato da noi. Il tuo ordine è stato confermato.';
-    simulateSendSMS(result.numero, alertMessage, messaggi);
-
-    // Salvataggio sicuro nel file JSON strutturato
-    safeAppendToJsonFile(ordiniFilePath, ordineEffettuato);
-
-    // Svuota il carrello dell'utente dopo l'acquisto
-    await Carrello.deleteMany({ nome: nomeUtente });
-
-    res.json({ message: alertMessage, ordine: resultOrdine });
-  } catch (error) {
-    console.error('Errore durante l acquisto:', error);
-    res.status(500).json({ message: 'Errore durante la gestione della richiesta' });
-  }
-});
 
 // // VENDI OPERA (Proposta cliente)
 // app.post('/VendiOpera', async (req, res) => {
