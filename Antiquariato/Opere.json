@@ -1,73 +1,5 @@
 [
   {
-    "codice": "110",
-    "nome": "DavidMichelangelo",
-    "descrizione": "bello grande",
-    "prezzo": "250",
-    "immagine1": [
-      {
-        "type": "Buffer",
-        "data": [
-          83,
-          99,
-          114,
-          101,
-          101,
-          110,
-          115,
-          104,
-          111,
-          116,
-          32,
-          50,
-          48,
-          50,
-          51,
-          45,
-          49,
-          49,
-          45,
-          49,
-          51,
-          32,
-          50,
-          49,
-          52,
-          49,
-          52,
-          54,
-          46,
-          112,
-          110,
-          103
-        ]
-      }
-    ],
-    "immagine2": [
-      {
-        "type": "Buffer",
-        "data": []
-      }
-    ],
-    "immagine3": [
-      {
-        "type": "Buffer",
-        "data": []
-      }
-    ],
-    "immagine4": [
-      {
-        "type": "Buffer",
-        "data": []
-      }
-    ],
-    "tecnica": "mano",
-    "dimensione": "grandi",
-    "peso": "pesante",
-    "altezza": "alto",
-    "_id": "659ed2d9557fc5164087b154"
-  },
-  {
     "codice": "112",
     "nome": "DavidDonatello",
     "descrizione": "copia perfetta",
@@ -336,6 +268,32 @@
     "immagine4": [],
     "tecnica": "",
     "_id": "6a45354db5d8e8116737f2df",
+    "__v": 0
+  },
+  {
+    "codice": "TEST-1783269810359",
+    "nome": "Opera Autogenerata",
+    "descrizione": "Opera creata da Selenium per test automatizzato",
+    "prezzo": "150",
+    "immagine1": [],
+    "immagine2": [],
+    "immagine3": [],
+    "immagine4": [],
+    "tecnica": "Automazione",
+    "_id": "6a4a89b2f43b6dd1fe374e94",
+    "__v": 0
+  },
+  {
+    "codice": "MOD-1783270642367",
+    "nome": "Opera Modificata!",
+    "descrizione": "",
+    "prezzo": "9999",
+    "immagine1": [],
+    "immagine2": [],
+    "immagine3": [],
+    "immagine4": [],
+    "tecnica": "",
+    "_id": "6a4a8cf2f43b6dd1fe374e97",
     "__v": 0
   }
 ]

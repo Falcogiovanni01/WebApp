@@ -136,5 +136,27 @@
     ],
     "_id": "6a466f8661e33f95af87d2eb",
     "__v": 0
+  },
+  {
+    "id": 67808,
+    "utente": "Gio",
+    "data": "2026-07-05",
+    "prezzo": 500,
+    "prodottiAcquistati": [
+      {
+        "codice": "110",
+        "prezzo": "250",
+        "quantita": 1,
+        "_id": "6a4a8775e8393be3b5ac8603"
+      },
+      {
+        "codice": "110",
+        "prezzo": "250",
+        "quantita": 1,
+        "_id": "6a4a8775e8393be3b5ac8604"
+      }
+    ],
+    "_id": "6a4a8775e8393be3b5ac8602",
+    "__v": 0
   }
 ]
