@@ -295,5 +295,83 @@
     "tecnica": "",
     "_id": "6a4a8cf2f43b6dd1fe374e97",
     "__v": 0
+  },
+  {
+    "codice": "MOD-1783351511240",
+    "nome": "Opera da Modificare",
+    "descrizione": "",
+    "prezzo": "150",
+    "immagine1": [],
+    "immagine2": [],
+    "immagine3": [],
+    "immagine4": [],
+    "tecnica": "",
+    "_id": "6a4bc8d72b68ce0c46d419a3",
+    "__v": 0
+  },
+  {
+    "codice": "MOD-1783351512847",
+    "nome": "Titolo Modificato!",
+    "descrizione": "",
+    "prezzo": "9999",
+    "immagine1": [],
+    "immagine2": [],
+    "immagine3": [],
+    "immagine4": [],
+    "tecnica": "",
+    "_id": "6a4bc8d92b68ce0c46d419a6",
+    "__v": 0
+  },
+  {
+    "codice": "MOD-1783351552755",
+    "nome": "Opera da Modificare",
+    "descrizione": "",
+    "prezzo": "150",
+    "immagine1": [],
+    "immagine2": [],
+    "immagine3": [],
+    "immagine4": [],
+    "tecnica": "",
+    "_id": "6a4bc9012b68ce0c46d419aa",
+    "__v": 0
+  },
+  {
+    "codice": "MOD-1783351554312",
+    "nome": "Titolo Modificato!",
+    "descrizione": "",
+    "prezzo": "9999",
+    "immagine1": [],
+    "immagine2": [],
+    "immagine3": [],
+    "immagine4": [],
+    "tecnica": "",
+    "_id": "6a4bc9022b68ce0c46d419ad",
+    "__v": 0
+  },
+  {
+    "codice": "DEL-1783352513844",
+    "nome": "Opera da Rimuovere",
+    "descrizione": "",
+    "prezzo": "150",
+    "immagine1": [],
+    "immagine2": [],
+    "immagine3": [],
+    "immagine4": [],
+    "tecnica": "",
+    "_id": "6a4bccc24743e31c7bac301d",
+    "__v": 0
+  },
+  {
+    "codice": "DEL-1783352800892",
+    "nome": "Opera da Rimuovere",
+    "descrizione": "",
+    "prezzo": "150",
+    "immagine1": [],
+    "immagine2": [],
+    "immagine3": [],
+    "immagine4": [],
+    "tecnica": "",
+    "_id": "6a4bcde14743e31c7bac301f",
+    "__v": 0
   }
 ]

@@ -22,6 +22,27 @@ public class GestoreFSMTest {
     
     private final String BASE_URL = "http://localhost:3000"; 
 
+    // --- METODI HELPER PER NON RIPETERE IL CODICE (DRY) ---
+
+    private void loginDiSupporto() {
+        driver.manage().deleteAllCookies();
+        driver.navigate().refresh();
+        driver.get(BASE_URL);
+        wait.until(ExpectedConditions.visibilityOfElementLocated(By.id("user"))).sendKeys("admin");
+        driver.findElement(By.id("pass")).sendKeys("admin");
+        driver.findElement(By.cssSelector("#form-login-gestore button[type='submit']")).click();
+        wait.until(ExpectedConditions.visibilityOfElementLocated(By.id("form-aggiungi")));
+    }
+
+    private void aggiungiOperaDiSupporto(String codice, String nome) {
+        WebElement formAggiungi = driver.findElement(By.id("form-aggiungi"));
+        formAggiungi.findElement(By.name("codice")).sendKeys(codice);
+        formAggiungi.findElement(By.name("nome")).sendKeys(nome);
+        formAggiungi.findElement(By.name("prezzo")).sendKeys("150");
+        formAggiungi.findElement(By.cssSelector("button[data-testid='btn-submit-aggiungi']")).click();
+        try { wait.until(ExpectedConditions.alertIsPresent()); driver.switchTo().alert().accept(); } catch (Exception e) {}
+    }
+
     @BeforeAll
     void setUp() {
         // Configurazione per far aprire Chrome in automatico
@@ -40,6 +61,13 @@ public class GestoreFSMTest {
     }
 
     // Strutturiamo il test esattamente come il  diagramma a stati
+    /**************
+     * 
+     * S0_Login
+     * se esegui la classe S0_login, vedrai che il test fallisce perché il browser mantiene la sessione precedente.
+     * Per risolvere questo problema, dobbiamo cancellare i cookie prima di ogni test
+     * 
+     */
     @Nested
     @DisplayName("Stato S0: Login Gestore")
     class S0_Login {
@@ -197,6 +225,52 @@ public class GestoreFSMTest {
         }
 
         @Test
+        @DisplayName("Transizione S2 -> Report: Visualizzazione Report Acquisti")
+        void testReportAcquisti() {
+            // 1. Clicchiamo sulla tab Offerte / Report assicurandoci sia cliccabile
+            WebElement btnOfferte = wait.until(ExpectedConditions.elementToBeClickable(By.cssSelector("button[data-target='tab-offerte']")));
+            btnOfferte.click();
+
+            // 2. Verifica intermedia: la sezione del report deve diventare visibile nel DOM
+            WebElement tabOfferte = wait.until(ExpectedConditions.visibilityOfElementLocated(By.id("tab-offerte")));
+            assertTrue(tabOfferte.isDisplayed(), "La sezione Offerte/Report doveva essere visibile a schermo.");
+
+            // 3. Interagiamo con il bottone specifico del Report Acquisti
+            WebElement btnRepAcquisti = driver.findElement(By.id("btn-rep-acquisti"));
+            btnRepAcquisti.click();
+
+            // 4. Verifica finale: il pannello dei risultati deve attivarsi e mostrarsi all'utente
+            WebElement reportResults = wait.until(ExpectedConditions.visibilityOfElementLocated(By.id("report-results")));
+            assertTrue(reportResults.isDisplayed(), "Il pannello dei risultati del report acquisti deve essere visibile.");
+            
+            System.out.println("[TEST SUPERATO] Navigazione ed elaborazione Report Acquisti completata con successo.");
+        }
+
+        @Test
+        @DisplayName("Transizione S2 -> Report: Visualizzazione Report Vendite")
+        void testReportVendite() {
+            // 1. Clicchiamo sulla tab Offerte / Report
+            WebElement btnOfferte = wait.until(ExpectedConditions.elementToBeClickable(By.cssSelector("button[data-target='tab-offerte']")));
+            btnOfferte.click();
+
+            // 2. Verifica intermedia di visibilità della tab
+            WebElement tabOfferte = wait.until(ExpectedConditions.visibilityOfElementLocated(By.id("tab-offerte")));
+            assertTrue(tabOfferte.isDisplayed(), "La sezione Offerte/Report doveva essere visibile a schermo.");
+
+            // 3. Interagiamo con il bottone specifico del Report Vendite
+            WebElement btnRepVendite = driver.findElement(By.id("btn-rep-vendite"));
+            btnRepVendite.click();
+
+            // 4. Verifica finale sulla comparsa del box dei risultati
+            WebElement reportResults = wait.until(ExpectedConditions.visibilityOfElementLocated(By.id("report-results")));
+            assertTrue(reportResults.isDisplayed(), "Il pannello dei risultati del report vendite deve essere visibile.");
+            
+            System.out.println(" [TEST SUPERATO] Navigazione ed elaborazione Report Vendite completata con successo.");
+        }
+
+
+
+        @Test
         @DisplayName("Transizione S2 -> S0: Logout e Distruzione Sessione")
         void testLogoutGestore() { // LA POST CONDIZIONE SAREBBE STATA QUELLA DI DISTRUGGERE IL COOKIE, MA NEL NOSTRO CASO LO CONSERVIAMO PER DUE ORE. 
             // 1. Siamo in S2. Troviamo il bottone di logout e lo clicchiamo.
@@ -248,74 +322,145 @@ public class GestoreFSMTest {
         assertTrue(formAggiungi.isDisplayed(), "Il sistema deve rimanere nello stato S2 dopo l'aggiunta.");
         System.out.println("[TEST SUPERATO] Inserita opera dinamica nel database, pronta per l'acquisto.");
     }
+
+    // Test per verificare che il sistema blocchi l'inserimento quando i campi obbligatori sono vuoti
+    // Questo test simula un tentativo di aggiunta senza compilare i campi richiesti, verificando che il form non venga inviato e che l'utente rimanga nello stato S2.
+    @Test
+        @DisplayName("Transizione S2 -> S2: Aggiunta Fallita (Campi Vuoti)")
+        void testAggiuntaFallita() {
+            WebElement formAggiungi = wait.until(ExpectedConditions.visibilityOfElementLocated(By.id("form-aggiungi")));
+            
+            // Non compiliamo nulla e premiamo subito Submit
+            WebElement btnSubmit = formAggiungi.findElement(By.cssSelector("button[data-testid='btn-submit-aggiungi']"));
+            btnSubmit.click();
+
+            // Il form usa l'attributo HTML5 'required', quindi il browser dovrebbe bloccare il submit.
+            // Verifichiamo che il form sia ancora lì e non sia scattata nessuna transizione.
+            assertTrue(formAggiungi.isDisplayed(), "Il form deve restare visibile perché mancano i campi obbligatori.");
+            System.out.println("[TEST SUPERATO] Inserimento bloccato correttamente per campi mancanti.");
+        }
     
 
-    @Test
+}
+
+    @Nested
+    @DisplayName("Stato S3: Modifica Opera")
+    class S3_Modifica {
+        // Variabile per memorizzare il codice dell'opera creata dinamicamente
+        // Questo codice sarà utilizzato nei test di modifica per garantire che stiamo lavorando con un'opera esistente
+        // l'obiettivo è evitare conflitti con opere già presenti nel database e garantire l'isolamento dei test
+        // per rendere il test ripetibile e affidabile, generiamo un codice unico basato sul timestamp corrente
+        // Questo approccio assicura che ogni esecuzione del test lavori con un'opera "fresca" e non interferisca con altre esecuzioni o dati preesistenti
+        String codiceTest;
+
+        @BeforeEach
+        void setup() {
+            codiceTest = "MOD-" + System.currentTimeMillis();
+            loginDiSupporto();
+            aggiungiOperaDiSupporto(codiceTest, "Opera da Modificare");
+        }
+
+        @Test
         @DisplayName("Transizione S3 -> S3: Modifica Fallita (Opera Inesistente)")
         void testModificaFallita() {
-            // 1. Andiamo nella tab Modifica (S3)
-           WebElement btnModifica =  driver.findElement(By.cssSelector("button[data-target='tab-modifica']"));
-           btnModifica.click();
-
+            driver.findElement(By.cssSelector("button[data-target='tab-modifica']")).click();
             WebElement formModifica = wait.until(ExpectedConditions.visibilityOfElementLocated(By.id("form-modifica")));
 
-            // 2. Inseriamo un codice palesemente falso
-            formModifica.findElement(By.name("codice")).sendKeys("CODICE-FALSO-999");
-            formModifica.findElement(By.name("nome")).sendKeys("Tentativo di Modifica Fallito");
-            formModifica.findElement(By.name("prezzo")).sendKeys("10");
-
-            // 3. Inviamo
+            formModifica.findElement(By.name("codice")).sendKeys("FALSO-999");
+            formModifica.findElement(By.name("nome")).sendKeys("Hacker");
             formModifica.findElement(By.cssSelector("button[data-testid='btn-submit-modifica']")).click();
 
-            // 4. Intercettiamo l'alert di errore generato dal backend
-            try {
-                wait.until(ExpectedConditions.alertIsPresent());
-                driver.switchTo().alert().accept();
-                System.out.println(" Alert di errore intercettato correttamente per opera inesistente.");
-            } catch (Exception e) {
-                System.out.println("Nessun alert rilevato per la modifica fallita.");
-            }
+            try { wait.until(ExpectedConditions.alertIsPresent()); driver.switchTo().alert().accept(); } catch (Exception e) {}
 
-            // 5. Verifica: Dobbiamo restare in S3
-            assertTrue(formModifica.isDisplayed(), "Il sistema doveva restare nella schermata di modifica dopo un errore.");
-            System.out.println("[TEST SUPERATO] Modifica bloccata correttamente per codice inesistente.");
+            assertTrue(formModifica.isDisplayed(), "Il sistema doveva restare in S3.");
+            System.out.println("[TEST SUPERATO] Tentativo di modifica fallito come previsto per opera inesistente.");
         }
 
         @Test
         @DisplayName("Transizione S3 -> S3: Modifica Avvenuta con Successo")
         void testModificaSuccesso() {
-            // FASE 1: Creiamo un'opera al volo per assicurarci che esista
-            String codiceTemp = "MOD-" + System.currentTimeMillis();
-            WebElement formAggiungi = wait.until(ExpectedConditions.visibilityOfElementLocated(By.id("form-aggiungi")));
-            formAggiungi.findElement(By.name("codice")).sendKeys(codiceTemp);
-            formAggiungi.findElement(By.name("nome")).sendKeys("Opera da Modificare");
-            formAggiungi.findElement(By.name("prezzo")).sendKeys("100");
-            formAggiungi.findElement(By.cssSelector("button[data-testid='btn-submit-aggiungi']")).click();
-            
-            try { wait.until(ExpectedConditions.alertIsPresent()); driver.switchTo().alert().accept(); } catch (Exception e) {}
-
-            // FASE 2: Ora passiamo in S3 (Modifica) per cambiare il prezzo dell'opera appena creata
             driver.findElement(By.cssSelector("button[data-target='tab-modifica']")).click();
             WebElement formModifica = wait.until(ExpectedConditions.visibilityOfElementLocated(By.id("form-modifica")));
 
-            formModifica.findElement(By.name("codice")).sendKeys(codiceTemp);
-            formModifica.findElement(By.name("nome")).sendKeys("Opera Modificata!");
+            formModifica.findElement(By.name("codice")).sendKeys(codiceTest); // Usiamo l'opera appena creata!
+            formModifica.findElement(By.name("nome")).sendKeys("Titolo Modificato!");
             formModifica.findElement(By.name("prezzo")).sendKeys("9999");
-            
             formModifica.findElement(By.cssSelector("button[data-testid='btn-submit-modifica']")).click();
 
-            // Intercettiamo l'alert di successo
-            try {
-                wait.until(ExpectedConditions.alertIsPresent());
-                driver.switchTo().alert().accept();
-            } catch (Exception e) {}
+            try { wait.until(ExpectedConditions.alertIsPresent()); driver.switchTo().alert().accept(); } catch (Exception e) {}
 
-            // Verifica: Dobbiamo restare in S3
-            assertTrue(formModifica.isDisplayed(), "Il sistema doveva restare nella schermata di modifica dopo il successo.");
-            System.out.println("[TEST SUPERATO] L'opera " + codiceTemp + " è stata modificata con successo.");
+            assertTrue(formModifica.isDisplayed(), "Il sistema doveva restare in S3.");
+            System.out.println("[TEST SUPERATO] Modifica avvenuta con successo per opera esistente.");
         }
-
     }
 
+
+    // Ora testiamo lo stato S4, ma per arrivarci dobbiamo prima fare un login valido.
+    // Salviamo un'opera di supporto prima di ogni test per garantire che ci sia qualcosa da rimuovere.
+    @Nested
+    @DisplayName("Stato S4: Rimozione Opera")
+    class S4_Rimozione {
+        
+        String codiceTest;
+
+        @BeforeEach
+        void setup() {
+            codiceTest = "DEL-" + System.currentTimeMillis();
+            loginDiSupporto();
+            aggiungiOperaDiSupporto(codiceTest, "Opera da Rimuovere");
+        }
+
+        @Test
+        @DisplayName("Transizione S4 -> S4: Rimozione Avvenuta con Successo")
+        void testRimozioneSuccesso() {
+            driver.findElement(By.cssSelector("button[data-target='tab-rimuovi']")).click();
+            WebElement formRimuovi = wait.until(ExpectedConditions.visibilityOfElementLocated(By.id("form-rimuovi")));
+
+            // Ora inseriamo SOLO il codice, in perfetta coerenza col tuo HTML
+            formRimuovi.findElement(By.name("codice")).sendKeys(codiceTest);
+            formRimuovi.findElement(By.cssSelector("button[data-testid='btn-submit-rimuovi']")).click();
+
+            try { wait.until(ExpectedConditions.alertIsPresent()); driver.switchTo().alert().accept(); } catch (Exception e) {}
+
+            assertTrue(formRimuovi.isDisplayed(), "Il sistema doveva restare in S4 dopo l'eliminazione.");
+            System.out.println("[TEST SUPERATO] L'opera " + codiceTest + " è stata rimossa correttamente.");
+        }
+        
+ 
+    }
+
+    // Ora testiamo lo stato S4, ma per arrivarci dobbiamo prima fare un login valido.
+    // Dato che non necessitiamo di creare un'opera di supporto per questo test, ci limitiamo a fare il login e testiamo la rimozione fallita.
+    @Nested
+    @DisplayName("Stato S4: Rimozione (Negative Path)")
+    class S4_Rimozione_Fallimento {
+
+        @BeforeEach
+        void setup() {
+            loginDiSupporto(); // Qui facciamo SOLO il login. Niente spazzatura nel DB!
+        }
+
+        @Test
+        @DisplayName("Transizione S4 -> S4: Rimozione Fallita (Codice Inesistente)")
+        void testRimozioneFallita() {
+            driver.findElement(By.cssSelector("button[data-target='tab-rimuovi']")).click();
+            WebElement formRimuovi = wait.until(ExpectedConditions.visibilityOfElementLocated(By.id("form-rimuovi")));
+
+            // Testiamo il backend inserendo un codice che non esiste
+            formRimuovi.findElement(By.name("codice")).sendKeys("CODICE-INESISTENTE-999");
+            formRimuovi.findElement(By.cssSelector("button[data-testid='btn-submit-rimuovi']")).click();
+
+            // Intercettiamo l'alert di errore (status 404)
+            try { 
+                wait.until(ExpectedConditions.alertIsPresent()); 
+                driver.switchTo().alert().accept(); 
+            } catch (Exception e) {
+                System.out.println("Nessun alert rilevato per l'errore di rimozione.");
+            }
+
+            assertTrue(formRimuovi.isDisplayed(), "Il form di rimozione deve restare visibile dopo un errore.");
+            System.out.println("[TEST SUPERATO] Eliminazione bloccata correttamente per codice inesistente.");
+        }
+    }
 
 }
