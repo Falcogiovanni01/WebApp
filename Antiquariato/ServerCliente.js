@@ -143,10 +143,7 @@ app.post('/registrazione', async (req, res) => {
 
     const newLogin = new LoginCliente({ nome: newCliente.nome, password: newCliente.password });
     await newLogin.save();
-
-    const newCarrello = new Carrello({ nome: newCliente.nome });
-    await newCarrello.save();
-
+    
     const riepilogo = `UTENTE REGISTRATO nome:${newCliente.nome} password:${newCliente.password} numero:${newCliente.numero} carta:${newCliente.carta}`;
     res.json({ riepilogo });
   } catch (err) {
