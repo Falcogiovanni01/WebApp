@@ -1,57 +1,5 @@
 [
   {
-    "codice": "NUOVO_pROVA",
-    "nome": "bella opera",
-    "descrizione": "box",
-    "prezzo": "10",
-    "immagine1": [],
-    "immagine2": [],
-    "immagine3": [],
-    "immagine4": [],
-    "tecnica": "a mano",
-    "_id": "6a43e0e2bbef38e65887cc3e",
-    "__v": 0
-  },
-  {
-    "codice": "PROVA_01",
-    "nome": "MODIFICA_RIUSCITA",
-    "descrizione": "bella prova",
-    "prezzo": "50",
-    "immagine1": [],
-    "immagine2": [],
-    "immagine3": [],
-    "immagine4": [],
-    "tecnica": "a mano",
-    "_id": "6a4533a8b5d8e8116737f2d0",
-    "__v": 0
-  },
-  {
-    "codice": "Opera_01",
-    "nome": "Spettacolare",
-    "descrizione": "è veramente uno spettacolo, fidatevi.",
-    "prezzo": "100",
-    "immagine1": [],
-    "immagine2": [],
-    "immagine3": [],
-    "immagine4": [],
-    "tecnica": "macchina",
-    "_id": "6a453521b5d8e8116737f2db",
-    "__v": 0
-  },
-  {
-    "codice": "Opera_02",
-    "nome": "Castello",
-    "descrizione": "castello dei lego, prendetelo.",
-    "prezzo": "30",
-    "immagine1": [],
-    "immagine2": [],
-    "immagine3": [],
-    "immagine4": [],
-    "tecnica": "lego",
-    "_id": "6a453538b5d8e8116737f2dd",
-    "__v": 0
-  },
-  {
     "codice": "Opera_03",
     "nome": "Dragon ball",
     "descrizione": "fumetto in vendita ep.3",
@@ -166,6 +114,72 @@
     "immagine4": [],
     "tecnica": "",
     "_id": "6a4bcde14743e31c7bac301f",
+    "__v": 0
+  },
+  {
+    "codice": "TEST-1783441946359",
+    "nome": "Opera Autogenerata",
+    "descrizione": "Opera creata da Selenium per test automatizzato",
+    "prezzo": "150",
+    "immagine1": [],
+    "immagine2": [],
+    "immagine3": [],
+    "immagine4": [],
+    "tecnica": "Automazione",
+    "_id": "6a4d2a1a4ac5370cb9eca33d",
+    "__v": 0
+  },
+  {
+    "codice": "MOD-1783441974975",
+    "nome": "Opera da Modificare",
+    "descrizione": "",
+    "prezzo": "150",
+    "immagine1": [],
+    "immagine2": [],
+    "immagine3": [],
+    "immagine4": [],
+    "tecnica": "",
+    "_id": "6a4d2a37b5d8de730574c849",
+    "__v": 0
+  },
+  {
+    "codice": "MOD-1783441976564",
+    "nome": "Titolo Modificato!",
+    "descrizione": "",
+    "prezzo": "9999",
+    "immagine1": [],
+    "immagine2": [],
+    "immagine3": [],
+    "immagine4": [],
+    "tecnica": "",
+    "_id": "6a4d2a38df8246a21646c21d",
+    "__v": 0
+  },
+  {
+    "codice": "TEST-1783442782455",
+    "nome": "Opera Autogenerata",
+    "descrizione": "Opera creata da Selenium per test automatizzato",
+    "prezzo": "150",
+    "tecnica": "Automazione",
+    "_id": "6a4d2d5e3fa324d7cde26de1",
+    "__v": 0
+  },
+  {
+    "codice": "MOD-1783442783959",
+    "nome": "Opera da Modificare",
+    "descrizione": "",
+    "prezzo": "150",
+    "tecnica": "",
+    "_id": "6a4d2d602f84fe3a0d939ad5",
+    "__v": 0
+  },
+  {
+    "codice": "MOD-1783442785297",
+    "nome": "Titolo Modificato!",
+    "descrizione": "",
+    "prezzo": "9999",
+    "tecnica": "",
+    "_id": "6a4d2d6167f0f73b2edfeb73",
     "__v": 0
   }
 ]

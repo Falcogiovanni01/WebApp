@@ -189,15 +189,11 @@ public class GestoreFSMTest {
 
         @BeforeEach
         void setupLoginDiServizio() {
-            // Per testare S2, dobbiamo prima arrivarci. Facciamo un login veloce.
-            driver.get(BASE_URL);
-            WebElement userField = wait.until(ExpectedConditions.visibilityOfElementLocated(By.id("user")));
-            driver.findElement(By.id("pass")).sendKeys("admin"); 
-            userField.sendKeys("admin");
-            driver.findElement(By.cssSelector("#form-login-gestore button[type='submit']")).click();
-            
-            // Aspettiamo di essere in S2
-            wait.until(ExpectedConditions.visibilityOfElementLocated(By.id("form-aggiungi")));
+            // FIX: riusiamo l'helper loginDiSupporto() (già usato da S3_Modifica e S4_Rimozione),
+            // che cancella prima i cookie residui. Senza questo passaggio, se un test precedente
+            // aveva già una sessione valida, l'overlay di login risultava già nascosto al reload
+            // e #user non diventava mai "visibile" per Selenium (TimeoutException).
+            loginDiSupporto();
         }
 
         @Test

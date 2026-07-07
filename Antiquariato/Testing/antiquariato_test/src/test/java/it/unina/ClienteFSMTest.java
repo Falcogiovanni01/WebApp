@@ -10,6 +10,12 @@ import org.openqa.selenium.chrome.ChromeOptions;
 import org.openqa.selenium.support.ui.ExpectedConditions;
 import org.openqa.selenium.support.ui.WebDriverWait;
 
+import java.net.URI;
+import java.net.URLEncoder;
+import java.net.http.HttpClient;
+import java.net.http.HttpRequest;
+import java.net.http.HttpResponse;
+import java.nio.charset.StandardCharsets;
 import java.time.Duration;
 
 import static org.junit.jupiter.api.Assertions.*;
@@ -32,6 +38,11 @@ public class ClienteFSMTest {
     // LA loro assenza generava un errore 
     @BeforeAll
     void setUp() {
+        // FIX #3: garantiamo che l'utente di test esista nel DB, indipendentemente
+        // da quale macchina/DB venga usato per eseguire la suite (niente più
+        // precondizioni manuali da creare a mano prima di 'mvn test').
+        assicuraUtenteDiTest();
+
         ChromeOptions options = new ChromeOptions();
         options.addArguments("--remote-allow-origins=*");
         // 2. Disattiva il pop-up "Vuoi salvare la password?" e l'autofill
@@ -51,6 +62,57 @@ public class ClienteFSMTest {
     void tearDown() {
         if (driver != null) {
             driver.quit();
+        }
+    }
+
+    // ============================================================
+    // FIX #3: Provisioning automatico dell'utente di test.
+    // Non usa Selenium: è una chiamata HTTP diretta al server Cliente,
+    // eseguita una sola volta prima di aprire il browser. Rende la suite
+    // eseguibile da zero su un DB Mongo pulito, senza precondizioni manuali.
+    // ============================================================
+    private void assicuraUtenteDiTest() {
+        try {
+            HttpClient client = HttpClient.newHttpClient();
+
+            // 1. Proviamo prima il login: se l'utente esiste già con queste
+            // credenziali (es. da un'esecuzione precedente), non serve altro.
+            String loginBody = "nome=" + URLEncoder.encode(USER_TEST, StandardCharsets.UTF_8)
+                    + "&password=" + URLEncoder.encode(PASS_TEST, StandardCharsets.UTF_8);
+            HttpRequest loginReq = HttpRequest.newBuilder()
+                    .uri(URI.create(BASE_URL + "/login"))
+                    .header("Content-Type", "application/x-www-form-urlencoded")
+                    .POST(HttpRequest.BodyPublishers.ofString(loginBody))
+                    .build();
+            HttpResponse<String> loginRes = client.send(loginReq, HttpResponse.BodyHandlers.ofString());
+
+            if (loginRes.statusCode() == 200) {
+                System.out.println("[SETUP] Utente di test già presente nel DB: login verificato.");
+                return;
+            }
+
+            // 2. Login fallito (401): l'utente non esiste ancora, lo registriamo.
+            String regBody = "nome=" + URLEncoder.encode(USER_TEST, StandardCharsets.UTF_8)
+                    + "&password=" + URLEncoder.encode(PASS_TEST, StandardCharsets.UTF_8)
+                    + "&numero=" + URLEncoder.encode("3331234567", StandardCharsets.UTF_8)
+                    + "&carta=" + URLEncoder.encode("0000000000000000", StandardCharsets.UTF_8);
+            HttpRequest regReq = HttpRequest.newBuilder()
+                    .uri(URI.create(BASE_URL + "/registrazione"))
+                    .header("Content-Type", "application/x-www-form-urlencoded")
+                    .POST(HttpRequest.BodyPublishers.ofString(regBody))
+                    .build();
+            HttpResponse<String> regRes = client.send(regReq, HttpResponse.BodyHandlers.ofString());
+
+            if (regRes.statusCode() == 200) {
+                System.out.println("[SETUP] Utente di test creato automaticamente (DB era vuoto/pulito).");
+            } else {
+                System.out.println("[SETUP] ATTENZIONE: impossibile creare l'utente di test (status "
+                        + regRes.statusCode() + "). I test di login potrebbero fallire.");
+            }
+        } catch (Exception e) {
+            System.out.println("[SETUP] ATTENZIONE: impossibile contattare " + BASE_URL
+                    + " per predisporre l'utente di test (" + e.getMessage()
+                    + "). Verifica che ServerCliente.js e MongoDB siano avviati prima di lanciare i test.");
         }
     }
 
@@ -144,6 +206,15 @@ public class ClienteFSMTest {
     @DisplayName("Stato S3: Registrazione Nuovo Cliente")
     class S3_Registrazione {
 
+        @BeforeEach
+        void setup() {
+            // FIX: senza questo reset, se una classe annidata precedente
+            // (es. S2_S4_AreaPrivata) lascia il browser loggato, driver.get(BASE_URL)
+            // carica la pagina già in stato "loggato": auth-container (che contiene
+            // link-show-register) resta nascosto -> ElementNotInteractableException.
+            svuotaSessioneTotale();
+        }
+
         @Test
         @DisplayName("Transizione S3 -> S0: Registrazione Avvenuta con Successo")
         void testRegistrazioneSuccesso() {
@@ -212,6 +283,29 @@ public class ClienteFSMTest {
             WebElement appContainer = wait.until(ExpectedConditions.visibilityOfElementLocated(By.id("main-app-container")));
             assertTrue(appContainer.isDisplayed(), "Errore: Il sistema non ha riconosciuto la sessione attiva ed è tornato al login.");
             System.out.println(" [TEST SUPERATO] Persistenza della sessione confermata dopo ricaricamento della pagina.");
+        }
+
+        @Test
+        @DisplayName("Transizione S1 -> S0: Cookie di sessione assente/non valido")
+        void testCookieNonValidoTornaAlLogin() {
+            // 1. Partiamo da uno stato autenticato (S2), per assicurarci che il test
+            // stia davvero verificando una transizione e non un semplice stato iniziale.
+            eseguiLoginDiSupporto();
+            WebElement appContainer = wait.until(ExpectedConditions.visibilityOfElementLocated(By.id("main-app-container")));
+            assertTrue(appContainer.isDisplayed(), "Precondizione fallita: l'utente doveva risultare loggato prima del test.");
+
+            // 2. Simuliamo la scadenza/invalidazione del cookie di sessione,
+            // cancellandolo direttamente a livello di browser (bypassando l'httpOnly,
+            // cosa che l'applicazione client non potrebbe mai fare da sola).
+            driver.manage().deleteCookieNamed("session");
+
+            // 3. Ricarichiamo: senza cookie valido, checkSessionCliente deve rispondere 401
+            // e l'app deve tornare in S0 (schermata di login).
+            driver.navigate().refresh();
+
+            WebElement authContainer = wait.until(ExpectedConditions.visibilityOfElementLocated(By.id("auth-container")));
+            assertTrue(authContainer.isDisplayed(), "Senza un cookie di sessione valido, il sistema doveva tornare in S0 (Login).");
+            System.out.println(" [TEST SUPERATO] Cookie assente/non valido: transizione S1 -> S0 confermata.");
         }
     }
 
@@ -290,7 +384,7 @@ public class ClienteFSMTest {
             // 4. Ora siamo certi che il carrello scenda a ZERO. Il bottone deve sparire.
             Boolean isCartEmpty = wait.until(ExpectedConditions.invisibilityOfElementLocated(By.id("btn-acquista")));
             assertTrue(isCartEmpty, "L'opera non è stata rimossa correttamente o c'erano residui.");
-            System.out.println("✅ [TEST SUPERATO] Rimozione dal carrello completata (con pulizia preventiva).");
+            System.out.println("[TEST SUPERATO] Rimozione dal carrello completata (con pulizia preventiva).");
         }
 
         @Test

@@ -11,23 +11,21 @@ document.addEventListener('DOMContentLoaded', async () => {
     const formLogin = document.getElementById('form-login');
     const formRegister = document.getElementById('form-register');
 
-    // --- S0: VERIFICA SESSIONE (Integrazione Server/Client) ---
+    // --- S0: VERIFICA SESSIONE (FIX #1: unica fonte di verità = cookie lato server) ---
     async function checkAuthState() {
-        // Proviamo a vedere se il server riconosce il cookie
         try {
             const response = await fetch('/checkSessionCliente');
-            const userData = localStorage.getItem('user'); // Usiamo localStorage!
 
-            if (response.ok && userData) {
-                // STATO: LOGGATO
-                const user = JSON.parse(userData);
+            if (response.ok) {
+                // STATO: LOGGATO — il server ha validato il cookie e ci dice chi siamo
+                const data = await response.json();
                 authContainer.classList.add('hidden');
                 appContainer.classList.remove('hidden');
                 userInfo.classList.remove('hidden');
-                welcomeMsg.textContent = `Ciao, ${user.nome}`;
+                welcomeMsg.textContent = `Ciao, ${data.nome}`;
                 loadCatalog();
             } else {
-                // STATO: NON LOGGATO
+                // STATO: NON LOGGATO (nessun cookie valido)
                 authContainer.classList.remove('hidden');
                 appContainer.classList.add('hidden');
                 userInfo.classList.add('hidden');
@@ -84,8 +82,9 @@ document.addEventListener('DOMContentLoaded', async () => {
                 body: new URLSearchParams(data).toString()
             });
             if (response.ok) {
-                // Salvo su localStorage, NON sessionStorage
-                localStorage.setItem('user', JSON.stringify(data));
+                // FIX #1: non salviamo più nome/password in localStorage.
+                // L'unica prova di identità è il cookie httpOnly impostato dal server;
+                // checkAuthState() lo interroga direttamente per sapere chi è loggato.
                 checkAuthState();
             } else {
                 alert("Credenziali errate");
@@ -121,8 +120,7 @@ document.addEventListener('DOMContentLoaded', async () => {
 
     // --- LOGOUT ---
     document.getElementById('btn-logout').addEventListener('click', async () => {
-        await fetch('/logout'); 
-        localStorage.removeItem('user');
+        await fetch('/logout'); // il server cancella il cookie di sessione
         checkAuthState();
     });
 
@@ -159,15 +157,18 @@ document.addEventListener('DOMContentLoaded', async () => {
 
     // Aggiungi al Carrello (Messa nel window per poterla chiamare dall'onclick dell'HTML generato)
     window.addToCart = async function(codice) {
-        const user = JSON.parse(localStorage.getItem('user'));
         try {
             const response = await fetch('/aggiungiCarrello', {
                 method: 'POST',
                 headers: { 'Content-Type': 'application/x-www-form-urlencoded' },
-                body: new URLSearchParams({ nome: user.nome, codice: codice }).toString()
+                body: new URLSearchParams({ codice: codice }).toString()
             });
-            const res = await response.json();
-            alert("Opera aggiunta al carrello!");
+            if (response.ok) {
+                alert("Opera aggiunta al carrello!");
+            } else {
+                const err = await response.json();
+                alert(err.message || "Sessione scaduta: effettua di nuovo il login.");
+            }
         } catch (error) {
             console.error("Errore carrello:", error);
         }
@@ -175,15 +176,12 @@ document.addEventListener('DOMContentLoaded', async () => {
 
     // Carica Carrello
     async function loadCart() {
-        const user = JSON.parse(localStorage.getItem('user'));
         const cartList = document.getElementById('cart-list');
         const btnAcquista = document.getElementById('btn-acquista');
         
         try {
             const response = await fetch('/visualizzaCarrello', {
-                method: 'POST',
-                headers: { 'Content-Type': 'application/x-www-form-urlencoded' },
-                body: new URLSearchParams({ nome: user.nome, password: user.password }).toString()
+                method: 'POST'
             });
             const result = await response.json();
             
@@ -213,12 +211,11 @@ document.addEventListener('DOMContentLoaded', async () => {
 
     // Rimuovi dal Carrello
     window.removeFromCart = async function(codice) {
-        const user = JSON.parse(localStorage.getItem('user'));
         try {
             await fetch('/rimuoviCarrello', {
                 method: 'POST',
                 headers: { 'Content-Type': 'application/x-www-form-urlencoded' },
-                body: new URLSearchParams({ nome: user.nome, codice: codice }).toString()
+                body: new URLSearchParams({ codice: codice }).toString()
             });
             loadCart(); // Ricarica la vista
         } catch (error) {
@@ -228,12 +225,9 @@ document.addEventListener('DOMContentLoaded', async () => {
 
     // Procedi all'acquisto
     document.getElementById('btn-acquista').addEventListener('click', async () => {
-        const user = JSON.parse(localStorage.getItem('user'));
         try {
             const response = await fetch('/acquista', {
-                method: 'POST',
-                headers: { 'Content-Type': 'application/x-www-form-urlencoded' },
-                body: new URLSearchParams({ nome: user.nome, password: user.password }).toString()
+                method: 'POST'
             });
             const result = await response.json();
             alert(result.message || "Acquisto confermato!");

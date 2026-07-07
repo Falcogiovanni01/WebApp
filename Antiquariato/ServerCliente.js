@@ -2,6 +2,7 @@ const express = require('express');
 const fs = require('fs');
 const path = require('path');
 const mongoose = require('mongoose');
+const cookieParser = require('cookie-parser');
 
 const app = express();
 const PORT = 3001;
@@ -13,9 +14,25 @@ const STATIC_DIR = path.join(__dirname, 'Client');
 app.use(express.static(STATIC_DIR));
 app.use(express.urlencoded({ extended: true }));
 app.use(express.json());
+app.use(cookieParser());
 
 // ============================================================
-// FIX #2: Mantenuto - Route esplicita per la home page cliente
+// Middleware di autenticazione basato SOLO sul cookie
+// di sessione (stesso pattern già usato in ServerGestore.js).
+// Da qui in poi, l'identità dell'utente per ogni operazione
+// protetta viene letta da req.nomeAutenticato, mai da req.body.
+// ============================================================
+function requireClienteAuth(req, res, next) {
+  const nome = req.cookies && req.cookies.session;
+  if (!nome) {
+    return res.status(401).json({ message: 'Sessione non valida: effettua il login' });
+  }
+  req.nomeAutenticato = nome;
+  next();
+}
+
+// ============================================================
+// Mantenuto - Route esplicita per la home page cliente
 // ============================================================
 app.get('/', (req, res) => {
   res.sendFile(path.join(STATIC_DIR, 'Cliente.html'));
@@ -183,9 +200,9 @@ app.post('/login', async (req, res) => {
 
 // CHECK SESSION 
 app.get('/checkSessionCliente', (req, res) => {
-    const cookieHeader = req.headers.cookie;
-    if (cookieHeader && cookieHeader.includes('session=')) { 
-        res.json({ success: true, message: "Sessione client valida" });
+    const nome = req.cookies && req.cookies.session;
+    if (nome) {
+        res.json({ success: true, message: "Sessione client valida", nome });
     } else {
         res.status(401).json({ success: false, message: "Sessione non trovata" });
     }
@@ -211,7 +228,7 @@ app.get('/visualizza', (req, res) => {
 
 // AGGIUNGI OPERA AL CARRELLO
 // AGGIUNGI OPERA AL CARRELLO
-app.post('/aggiungiCarrello', async (req, res) => {
+app.post('/aggiungiCarrello', requireClienteAuth, async (req, res) => {
   try {
     let opere = [];
     if (fs.existsSync(opereFilePath)) {
@@ -221,9 +238,9 @@ app.post('/aggiungiCarrello', async (req, res) => {
     const prezzoCorrispondente = opere.find((opera) => opera.codice === req.body.codice);
     const prezzoOpera = prezzoCorrispondente ? parseFloat(prezzoCorrispondente.prezzo) : 0;
 
-    // Salva l'elemento nel carrello MongoDB dell'utente
+    // Salva l'elemento nel carrello MongoDB dell'utente autenticato (dal cookie, non dal body)
     const newCarrello = new Carrello({ 
-      nome: req.body.nome, 
+      nome: req.nomeAutenticato, 
       codice: req.body.codice, 
       prezzo: prezzoOpera 
     });
@@ -236,13 +253,15 @@ app.post('/aggiungiCarrello', async (req, res) => {
   }
 });
 // ACQUISTA
-app.post('/acquista', async (req, res) => {
+app.post('/acquista', requireClienteAuth, async (req, res) => {
   try {
-    const { nome: nomeUtente, password } = req.body;
-    const result = await Cliente.findOne({ nome: nomeUtente, password });
+    const nomeUtente = req.nomeAutenticato;
+    // Non serve più ri-verificare nome+password: il cookie di sessione
+    // ha già dimostrato l'identità. Recuperiamo solo il profilo (es. per il numero SMS).
+    const result = await Cliente.findOne({ nome: nomeUtente });
 
     if (!result) {
-      return res.status(401).json({ message: 'Credenziali non valide' });
+      return res.status(404).json({ message: 'Utente non trovato' });
     }
 
     const carrello = await Carrello.find({ nome: nomeUtente });
@@ -307,14 +326,14 @@ app.post('/acquista', async (req, res) => {
 });
 
 // RIMUOVI DAL CARRELLO
-app.post('/rimuoviCarrello', async (req, res) => {
+app.post('/rimuoviCarrello', requireClienteAuth, async (req, res) => {
   try {
-    const condition = { nome: req.body.nome, codice: req.body.codice };
+    const condition = { nome: req.nomeAutenticato, codice: req.body.codice };
     const result = await Carrello.findOne(condition);
 
     if (result) {
       await Carrello.deleteOne(condition);
-      res.json({ message: 'Riepilogo opera eliminata:', nome: req.body.nome, codice: req.body.codice });
+      res.json({ message: 'Riepilogo opera eliminata:', nome: req.nomeAutenticato, codice: req.body.codice });
     } else {
       res.status(404).json({ message: 'Elemento non presente nel carrello' });
     }
@@ -325,15 +344,9 @@ app.post('/rimuoviCarrello', async (req, res) => {
 });
 
 // VISUALIZZA CARRELLO
-app.post('/visualizzaCarrello', async (req, res) => {
+app.post('/visualizzaCarrello', requireClienteAuth, async (req, res) => {
   try {
-    const { nome: nomeUtente, password } = req.body;
-    const result = await LoginCliente.findOne({ nome: nomeUtente, password });
-
-    if (!result) {
-      return res.status(401).json({ message: 'Credenziali non valide' });
-    }
-
+    const nomeUtente = req.nomeAutenticato;
     const carrello = await Carrello.find({ nome: nomeUtente });
     if (carrello.length > 0) {
       res.json({ carrello });
