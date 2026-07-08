@@ -32,8 +32,8 @@
                 <h2 class="text-xl font-bold mb-2">Nuova Registrazione</h2>
                 <input type="text" name="nome" placeholder="Username" required data-testid="reg-username" class="border p-2 rounded">
                 <input type="password" name="password" placeholder="Password" required data-testid="reg-password" class="border p-2 rounded">
-                <input type="text" name="numero" placeholder="Numero di Telefono" required data-testid="reg-phone" class="border p-2 rounded">
-                <input type="text" name="carta" placeholder="Numero Carta" required data-testid="reg-card" class="border p-2 rounded">
+                <input type="text" name="numero" placeholder="Numero di Telefono" required data-testid="reg-phone" pattern="\d{10}" maxlength="10" inputmode="numeric" title="Il numero di telefono deve contenere esattamente 10 cifre" class="border p-2 rounded">
+                <input type="text" name="carta" placeholder="Numero Carta" required data-testid="reg-card" pattern="\d{16}" maxlength="16" inputmode="numeric" title="Il numero di carta deve contenere esattamente 16 cifre" class="border p-2 rounded">
                 <button type="submit" data-testid="reg-submit" class="bg-green-600 text-white p-2 rounded hover:bg-green-700 font-bold">Registrati</button>
                 <p class="text-sm text-center mt-2">Torna al <a href="#" id="link-show-login" class="text-blue-600 underline">Login</a></p>
             </form>

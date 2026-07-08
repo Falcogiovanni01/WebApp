@@ -1,0 +1,227 @@
+<svg xmlns="http://www.w3.org/2000/svg" xmlns:xlink="http://www.w3.org/1999/xlink" width="673pt" height="807pt" viewBox="0.00 0.00 673.00 807.00">
+<g id="graph0" class="graph" transform="scale(1 1) rotate(0) translate(4 802.92)">
+<title>G</title>
+<polygon fill="white" stroke="none" points="-4,4 -4,-802.92 669.17,-802.92 669.17,4 -4,4"/>
+<g id="clust1" class="cluster">
+<title>cluster_dashboard</title>
+<polygon fill="lightgrey" stroke="lightgrey" points="11.02,-8 11.02,-790.92 381.02,-790.92 381.02,-8 11.02,-8"/>
+<text xml:space="preserve" text-anchor="middle" x="196.02" y="-774.32" font-family="Times,serif" font-size="14.00">Dashboard Gestore (Area Protetta)</text>
+</g>
+<!-- S0 -->
+<g id="node1" class="node">
+<title>S0</title>
+<ellipse fill="white" stroke="black" stroke-width="2.5" cx="431.02" cy="-213.18" rx="42.12" ry="42.12"/>
+<text xml:space="preserve" text-anchor="middle" x="431.02" y="-217.38" font-family="Helvetica,sans-Serif" font-size="14.00">S0:</text>
+<text xml:space="preserve" text-anchor="middle" x="431.02" y="-200.58" font-family="Helvetica,sans-Serif" font-size="14.00">LOGIN</text>
+</g>
+<!-- S0&#45;&gt;S0 -->
+<g id="edge3" class="edge">
+<title>S0-&gt;S0</title>
+<path fill="none" stroke="black" d="M471.76,-227.43C482.76,-226.68 491.14,-221.93 491.14,-213.18 491.14,-207.72 487.87,-203.81 482.73,-201.47"/>
+<polygon fill="black" stroke="black" points="483.77,-198.12 473.23,-199.28 482.19,-204.94 483.77,-198.12"/>
+<text xml:space="preserve" text-anchor="middle" x="529.49" y="-210.18" font-family="Helvetica,sans-Serif" font-size="10.00">credenziali errate</text>
+</g>
+<!-- S1 -->
+<g id="node2" class="node">
+<title>S1</title>
+<ellipse fill="white" stroke="black" cx="507.02" cy="-57.3" rx="55.32" ry="55.32"/>
+<text xml:space="preserve" text-anchor="middle" x="507.02" y="-69.9" font-family="Helvetica,sans-Serif" font-size="14.00">S1:</text>
+<text xml:space="preserve" text-anchor="middle" x="507.02" y="-53.1" font-family="Helvetica,sans-Serif" font-size="14.00">CHECK</text>
+<text xml:space="preserve" text-anchor="middle" x="507.02" y="-36.3" font-family="Helvetica,sans-Serif" font-size="14.00">SESSION</text>
+</g>
+<!-- S0&#45;&gt;S1 -->
+<g id="edge4" class="edge">
+<title>S0-&gt;S1</title>
+<path fill="none" stroke="black" d="M407.5,-177.05C400.63,-162.27 396.76,-145.17 404.31,-130.62 413.76,-112.41 430.13,-97.81 447.07,-86.64"/>
+<polygon fill="black" stroke="black" points="448.56,-89.83 455.21,-81.58 444.87,-83.89 448.56,-89.83"/>
+<text xml:space="preserve" text-anchor="middle" x="442.66" y="-133.62" font-family="Helvetica,sans-Serif" font-size="10.00">credenziali valide</text>
+</g>
+<!-- S1&#45;&gt;S0 -->
+<g id="edge1" class="edge">
+<title>S1-&gt;S0</title>
+<path fill="none" stroke="black" d="M496.46,-112.11C493.46,-122.51 489.7,-133.12 485.02,-142.62 480.05,-152.7 473.49,-162.73 466.65,-171.9"/>
+<polygon fill="black" stroke="black" points="464.07,-169.52 460.7,-179.56 469.6,-173.81 464.07,-169.52"/>
+<text xml:space="preserve" text-anchor="middle" x="528.43" y="-133.62" font-family="Helvetica,sans-Serif" font-size="10.00">cookie non valido</text>
+</g>
+<!-- S2 -->
+<g id="node3" class="node">
+<title>S2</title>
+<ellipse fill="white" stroke="black" cx="221.02" cy="-697.31" rx="60.82" ry="60.82"/>
+<text xml:space="preserve" text-anchor="middle" x="221.02" y="-709.91" font-family="Helvetica,sans-Serif" font-size="14.00">S2:</text>
+<text xml:space="preserve" text-anchor="middle" x="221.02" y="-693.11" font-family="Helvetica,sans-Serif" font-size="14.00">AGGIUNGI</text>
+<text xml:space="preserve" text-anchor="middle" x="221.02" y="-676.31" font-family="Helvetica,sans-Serif" font-size="14.00">OPERA</text>
+</g>
+<!-- S1&#45;&gt;S2 -->
+<g id="edge2" class="edge">
+<title>S1-&gt;S2</title>
+<path fill="none" stroke="black" d="M546.03,-96.99C571.11,-126.07 599.02,-168.3 599.02,-212.18 599.02,-529.78 599.02,-529.78 599.02,-529.78 599.02,-661.9 403.25,-690.1 293.49,-695.53"/>
+<polygon fill="black" stroke="black" points="293.52,-692.03 283.68,-695.96 293.82,-699.02 293.52,-692.03"/>
+<text xml:space="preserve" text-anchor="middle" x="632.09" y="-364.41" font-family="Helvetica,sans-Serif" font-size="10.00">cookie validato</text>
+</g>
+<!-- S2&#45;&gt;S0 -->
+<g id="edge5" class="edge">
+<title>S2-&gt;S0</title>
+<path fill="none" stroke="black" d="M273.06,-665.55C302.5,-646.23 338.43,-619.18 364.02,-588.49 417.32,-524.55 428.83,-502.08 448.02,-421.07 460.3,-369.19 452.71,-308.18 444.11,-265.92"/>
+<polygon fill="black" stroke="black" points="447.57,-265.32 442.05,-256.27 440.72,-266.78 447.57,-265.32"/>
+<text xml:space="preserve" text-anchor="middle" x="456.91" y="-442.07" font-family="Helvetica,sans-Serif" font-size="10.00">logout</text>
+</g>
+<!-- S2&#45;&gt;S2 -->
+<g id="edge9" class="edge">
+<title>S2-&gt;S2</title>
+<path fill="none" stroke="black" d="M280.14,-712.5C291.65,-710.74 299.83,-705.67 299.83,-697.31 299.83,-691.95 296.48,-687.94 291.04,-685.29"/>
+<polygon fill="black" stroke="black" points="292.17,-681.98 281.59,-682.54 290.21,-688.7 292.17,-681.98"/>
+<text xml:space="preserve" text-anchor="middle" x="336.24" y="-694.31" font-family="Helvetica,sans-Serif" font-size="10.00">Submit Aggiungi</text>
+</g>
+<!-- S3 -->
+<g id="node4" class="node">
+<title>S3</title>
+<ellipse fill="white" stroke="black" cx="99.02" cy="-528.78" rx="59.71" ry="59.71"/>
+<text xml:space="preserve" text-anchor="middle" x="99.02" y="-541.38" font-family="Helvetica,sans-Serif" font-size="14.00">S3:</text>
+<text xml:space="preserve" text-anchor="middle" x="99.02" y="-524.58" font-family="Helvetica,sans-Serif" font-size="14.00">MODIFICA</text>
+<text xml:space="preserve" text-anchor="middle" x="99.02" y="-507.78" font-family="Helvetica,sans-Serif" font-size="14.00">OPERA</text>
+</g>
+<!-- S2&#45;&gt;S3 -->
+<g id="edge12" class="edge">
+<title>S2-&gt;S3</title>
+<path fill="none" stroke="black" d="M178.62,-638.44C166.34,-621.67 152.95,-603.39 140.71,-586.69"/>
+<polygon fill="black" stroke="black" points="175.77,-640.48 184.51,-646.47 181.42,-636.34 175.77,-640.48"/>
+<polygon fill="black" stroke="black" points="143.67,-584.81 134.94,-578.82 138.03,-588.95 143.67,-584.81"/>
+<text xml:space="preserve" text-anchor="middle" x="208.7" y="-609.49" font-family="Helvetica,sans-Serif" font-size="10.00">Modifica ↔ Aggiungi</text>
+</g>
+<!-- S4 -->
+<g id="node5" class="node">
+<title>S4</title>
+<ellipse fill="white" stroke="black" cx="231.02" cy="-367.41" rx="53.66" ry="53.66"/>
+<text xml:space="preserve" text-anchor="middle" x="231.02" y="-380.01" font-family="Helvetica,sans-Serif" font-size="14.00">S4:</text>
+<text xml:space="preserve" text-anchor="middle" x="231.02" y="-363.21" font-family="Helvetica,sans-Serif" font-size="14.00">RIMUOVI</text>
+<text xml:space="preserve" text-anchor="middle" x="231.02" y="-346.41" font-family="Helvetica,sans-Serif" font-size="14.00">OPERA</text>
+</g>
+<!-- S2&#45;&gt;S4 -->
+<g id="edge13" class="edge">
+<title>S2-&gt;S4</title>
+<path fill="none" stroke="black" d="M253.8,-632.96C255.46,-628.15 256.9,-623.29 258.02,-618.49 276.03,-540.81 275.45,-517.31 260.02,-439.07 259.23,-435.07 258.21,-431 257.02,-426.94"/>
+<polygon fill="black" stroke="black" points="250.65,-631.4 250.38,-641.99 257.19,-633.88 250.65,-631.4"/>
+<polygon fill="black" stroke="black" points="260.45,-426.16 254.02,-417.73 253.79,-428.33 260.45,-426.16"/>
+<text xml:space="preserve" text-anchor="middle" x="316.03" y="-525.78" font-family="Helvetica,sans-Serif" font-size="10.00">Rimuovi ↔ Aggiungi</text>
+</g>
+<!-- S5 -->
+<g id="node6" class="node">
+<title>S5</title>
+<ellipse fill="white" stroke="black" cx="157.02" cy="-213.18" rx="52.56" ry="52.56"/>
+<text xml:space="preserve" text-anchor="middle" x="157.02" y="-225.78" font-family="Helvetica,sans-Serif" font-size="14.00">S5:</text>
+<text xml:space="preserve" text-anchor="middle" x="157.02" y="-208.98" font-family="Helvetica,sans-Serif" font-size="14.00">TAB</text>
+<text xml:space="preserve" text-anchor="middle" x="157.02" y="-192.18" font-family="Helvetica,sans-Serif" font-size="14.00">REPORT</text>
+</g>
+<!-- S2&#45;&gt;S5 -->
+<g id="edge14" class="edge">
+<title>S2-&gt;S5</title>
+<path fill="none" stroke="black" d="M151.65,-676.92C108.38,-660.84 56.12,-633.21 30.02,-588.49 -32.14,-482.04 14.6,-424.84 68.02,-313.75 78.2,-292.56 94.29,-272.54 109.99,-256.08"/>
+<polygon fill="black" stroke="black" points="150.41,-680.19 161.01,-680.25 152.76,-673.6 150.41,-680.19"/>
+<polygon fill="black" stroke="black" points="112.07,-258.96 116.59,-249.37 107.08,-254.05 112.07,-258.96"/>
+<text xml:space="preserve" text-anchor="middle" x="51" y="-442.07" font-family="Helvetica,sans-Serif" font-size="10.00">Report ↔ Aggiungi</text>
+</g>
+<!-- S3&#45;&gt;S0 -->
+<g id="edge6" class="edge">
+<title>S3-&gt;S0</title>
+<path fill="none" stroke="black" d="M154.96,-507.44C236.31,-477.74 378.07,-425.56 382.02,-421.07 401.89,-398.48 416.32,-320.75 424.19,-267.28"/>
+<polygon fill="black" stroke="black" points="427.64,-267.82 425.6,-257.43 420.71,-266.83 427.64,-267.82"/>
+<text xml:space="preserve" text-anchor="middle" x="430.12" y="-364.41" font-family="Helvetica,sans-Serif" font-size="10.00">logout</text>
+</g>
+<!-- S3&#45;&gt;S3 -->
+<g id="edge10" class="edge">
+<title>S3-&gt;S3</title>
+<path fill="none" stroke="black" d="M157.31,-543.78C168.66,-542.04 176.73,-537.04 176.73,-528.78 176.73,-523.49 173.42,-519.54 168.05,-516.93"/>
+<polygon fill="black" stroke="black" points="169.34,-513.66 158.76,-514.21 167.38,-520.37 169.34,-513.66"/>
+<text xml:space="preserve" text-anchor="middle" x="212.29" y="-525.78" font-family="Helvetica,sans-Serif" font-size="10.00">Submit Modifica</text>
+</g>
+<!-- S3&#45;&gt;S4 -->
+<g id="edge15" class="edge">
+<title>S3-&gt;S4</title>
+<path fill="none" stroke="black" d="M144.12,-473.33C159.01,-455.35 175.47,-435.47 190.04,-417.89"/>
+<polygon fill="black" stroke="black" points="141.49,-471.01 137.81,-480.95 146.88,-475.48 141.49,-471.01"/>
+<polygon fill="black" stroke="black" points="192.37,-420.56 196.05,-410.63 186.98,-416.1 192.37,-420.56"/>
+<text xml:space="preserve" text-anchor="middle" x="212.6" y="-442.07" font-family="Helvetica,sans-Serif" font-size="10.00">Rimuovi ↔ Modifica</text>
+</g>
+<!-- S3&#45;&gt;S5 -->
+<g id="edge16" class="edge">
+<title>S3-&gt;S5</title>
+<path fill="none" stroke="black" d="M119.42,-460.65C120.03,-457.43 120.57,-454.22 121.02,-451.07 121.76,-445.79 123.77,-443.64 121.02,-439.07 112.16,-424.39 95.74,-435.76 86.87,-421.07 62.24,-380.23 72.47,-359.22 86.87,-313.75 92.8,-295.05 103.65,-276.82 115.07,-261.18"/>
+<polygon fill="black" stroke="black" points="116.06,-459.62 117.37,-470.14 122.9,-461.1 116.06,-459.62"/>
+<polygon fill="black" stroke="black" points="117.64,-263.58 120.91,-253.5 112.07,-259.34 117.64,-263.58"/>
+<text xml:space="preserve" text-anchor="middle" x="127.45" y="-364.41" font-family="Helvetica,sans-Serif" font-size="10.00">Report ↔ Modifica</text>
+</g>
+<!-- S4&#45;&gt;S0 -->
+<g id="edge7" class="edge">
+<title>S4-&gt;S0</title>
+<path fill="none" stroke="black" d="M277.72,-340.29C309.47,-321.51 351.61,-294.5 385.02,-265.75 388.8,-262.49 392.57,-258.93 396.23,-255.25"/>
+<polygon fill="black" stroke="black" points="398.62,-257.82 402.99,-248.17 393.55,-252.99 398.62,-257.82"/>
+<text xml:space="preserve" text-anchor="middle" x="375.24" y="-286.75" font-family="Helvetica,sans-Serif" font-size="10.00">logout</text>
+</g>
+<!-- S4&#45;&gt;S4 -->
+<g id="edge11" class="edge">
+<title>S4-&gt;S4</title>
+<path fill="none" stroke="black" d="M283.19,-381.54C294.49,-380.16 302.68,-375.45 302.68,-367.41 302.68,-362.26 299.32,-358.48 293.93,-356.06"/>
+<polygon fill="black" stroke="black" points="295.22,-352.78 284.66,-353.66 293.46,-359.55 295.22,-352.78"/>
+<text xml:space="preserve" text-anchor="middle" x="337.69" y="-364.41" font-family="Helvetica,sans-Serif" font-size="10.00">Submit Rimuovi</text>
+</g>
+<!-- S4&#45;&gt;S5 -->
+<g id="edge17" class="edge">
+<title>S4-&gt;S5</title>
+<path fill="none" stroke="black" d="M202.88,-308.53C196.91,-296.25 190.62,-283.3 184.67,-271.06"/>
+<polygon fill="black" stroke="black" points="199.62,-309.84 207.14,-317.3 205.92,-306.78 199.62,-309.84"/>
+<polygon fill="black" stroke="black" points="187.95,-269.81 180.43,-262.34 181.65,-272.87 187.95,-269.81"/>
+<text xml:space="preserve" text-anchor="middle" x="236.25" y="-286.75" font-family="Helvetica,sans-Serif" font-size="10.00">Report ↔ Rimuovi</text>
+</g>
+<!-- S5&#45;&gt;S0 -->
+<g id="edge8" class="edge">
+<title>S5-&gt;S0</title>
+<path fill="none" stroke="black" d="M209.85,-213.18C257.69,-213.18 327.88,-213.18 376.3,-213.18"/>
+<polygon fill="black" stroke="black" points="376.3,-216.68 386.3,-213.18 376.3,-209.68 376.3,-216.68"/>
+<text xml:space="preserve" text-anchor="middle" x="299.24" y="-219.18" font-family="Helvetica,sans-Serif" font-size="10.00">logout</text>
+</g>
+<!-- S5_1 -->
+<g id="node7" class="node">
+<title>S5_1</title>
+<ellipse fill="white" stroke="black" cx="253.02" cy="-57.3" rx="58.07" ry="41.3"/>
+<text xml:space="preserve" text-anchor="middle" x="253.02" y="-69.9" font-family="Helvetica,sans-Serif" font-size="14.00">S5.1:</text>
+<text xml:space="preserve" text-anchor="middle" x="253.02" y="-53.1" font-family="Helvetica,sans-Serif" font-size="14.00">REPORT</text>
+<text xml:space="preserve" text-anchor="middle" x="253.02" y="-36.3" font-family="Helvetica,sans-Serif" font-size="14.00">ACQUISTI</text>
+</g>
+<!-- S5&#45;&gt;S5_1 -->
+<g id="edge18" class="edge">
+<title>S5-&gt;S5_1</title>
+<path fill="none" stroke="black" d="M179.86,-165.33C185.93,-153.78 192.7,-141.59 199.56,-130.62 205.27,-121.48 211.79,-112.01 218.26,-103.06"/>
+<polygon fill="black" stroke="black" points="220.96,-105.29 224.06,-95.16 215.32,-101.15 220.96,-105.29"/>
+<text xml:space="preserve" text-anchor="middle" x="229.29" y="-133.62" font-family="Helvetica,sans-Serif" font-size="10.00">Click Acquisti</text>
+</g>
+<!-- S5_2 -->
+<g id="node8" class="node">
+<title>S5_2</title>
+<ellipse fill="white" stroke="black" cx="95.02" cy="-57.3" rx="54.22" ry="41.3"/>
+<text xml:space="preserve" text-anchor="middle" x="95.02" y="-69.9" font-family="Helvetica,sans-Serif" font-size="14.00">S5.2:</text>
+<text xml:space="preserve" text-anchor="middle" x="95.02" y="-53.1" font-family="Helvetica,sans-Serif" font-size="14.00">REPORT</text>
+<text xml:space="preserve" text-anchor="middle" x="95.02" y="-36.3" font-family="Helvetica,sans-Serif" font-size="14.00">VENDITE</text>
+</g>
+<!-- S5&#45;&gt;S5_2 -->
+<g id="edge19" class="edge">
+<title>S5-&gt;S5_2</title>
+<path fill="none" stroke="black" d="M130.49,-167.65C126.2,-159.48 122.05,-150.92 118.66,-142.62 114.34,-132.07 110.52,-120.46 107.28,-109.32"/>
+<polygon fill="black" stroke="black" points="110.7,-108.55 104.64,-99.85 103.95,-110.43 110.7,-108.55"/>
+<text xml:space="preserve" text-anchor="middle" x="147.84" y="-133.62" font-family="Helvetica,sans-Serif" font-size="10.00">Click Vendite</text>
+</g>
+<!-- S5_1&#45;&gt;S5 -->
+<g id="edge20" class="edge">
+<title>S5_1-&gt;S5</title>
+<path fill="none" stroke="black" d="M264.39,-97.9C266.5,-112.68 266.15,-129.12 259.02,-142.62 249.34,-160.93 232.44,-175.33 215.15,-186.16"/>
+<polygon fill="black" stroke="black" points="213.69,-182.95 206.85,-191.04 217.24,-188.99 213.69,-182.95"/>
+<text xml:space="preserve" text-anchor="middle" x="290.35" y="-133.62" font-family="Helvetica,sans-Serif" font-size="10.00">Cambio Tab</text>
+</g>
+<!-- S5_2&#45;&gt;S5 -->
+<g id="edge21" class="edge">
+<title>S5_2-&gt;S5</title>
+<path fill="none" stroke="black" d="M64.4,-91.89C53.97,-107.49 46.88,-126.17 55.55,-142.62 65.17,-160.88 81.98,-175.26 99.18,-186.09"/>
+<polygon fill="black" stroke="black" points="97.04,-188.9 107.43,-190.98 100.61,-182.87 97.04,-188.9"/>
+<text xml:space="preserve" text-anchor="middle" x="82.78" y="-133.62" font-family="Helvetica,sans-Serif" font-size="10.00">Cambio Tab</text>
+</g>
+</g>
+</svg>

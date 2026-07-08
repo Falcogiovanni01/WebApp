@@ -300,5 +300,85 @@
     ],
     "_id": "6a4d2bebb955adf7ee1d241a",
     "__v": 0
+  },
+  {
+    "id": 19426,
+    "utente": "PROVA UTENTE",
+    "data": "2026-07-07",
+    "prezzo": 5,
+    "prodottiAcquistati": [
+      {
+        "codice": "Opera_03",
+        "prezzo": "5",
+        "quantita": 1,
+        "_id": "6a4d6aace715d331d40bea1c"
+      }
+    ],
+    "_id": "6a4d6aace715d331d40bea1b",
+    "__v": 0
+  },
+  {
+    "id": 89592,
+    "utente": "PROVA UTENTE",
+    "data": "2026-07-08",
+    "prezzo": 150,
+    "prodottiAcquistati": [
+      {
+        "codice": "TEST-1783269810359",
+        "prezzo": "150",
+        "quantita": 1,
+        "_id": "6a4e77f3f1b45124cda13c0a"
+      }
+    ],
+    "_id": "6a4e77f3f1b45124cda13c09",
+    "__v": 0
+  },
+  {
+    "id": 68742,
+    "utente": "PROVA UTENTE",
+    "data": "2026-07-08",
+    "prezzo": 9999,
+    "prodottiAcquistati": [
+      {
+        "codice": "MOD-1783270642367",
+        "prezzo": "9999",
+        "quantita": 1,
+        "_id": "6a4e7827010978065797be43"
+      }
+    ],
+    "_id": "6a4e7827010978065797be42",
+    "__v": 0
+  },
+  {
+    "id": 71046,
+    "utente": "PROVA UTENTE",
+    "data": "2026-07-08",
+    "prezzo": 150,
+    "prodottiAcquistati": [
+      {
+        "codice": "MOD-1783351511240",
+        "prezzo": "150",
+        "quantita": 1,
+        "_id": "6a4e7841f27232b3c1e6b445"
+      }
+    ],
+    "_id": "6a4e7841f27232b3c1e6b444",
+    "__v": 0
+  },
+  {
+    "id": 95865,
+    "utente": "PROVA UTENTE",
+    "data": "2026-07-08",
+    "prezzo": 9999,
+    "prodottiAcquistati": [
+      {
+        "codice": "MOD-1783351512847",
+        "prezzo": "9999",
+        "quantita": 1,
+        "_id": "6a4e7fadfd2d8866d6395e0a"
+      }
+    ],
+    "_id": "6a4e7fadfd2d8866d6395e09",
+    "__v": 0
   }
 ]

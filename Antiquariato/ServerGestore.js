@@ -41,13 +41,6 @@ const OperaSchema = new mongoose.Schema({
 });
 const Opera = mongoose.model('Opera', OperaSchema);
 
-/*const VendiOperaSchema = new mongoose.Schema({
-    nomeCliente: String,
-    nome: String,
-    prezzoVendita: String
-});
-const VendiOpera = mongoose.model('VendiOpera', VendiOperaSchema);
-*/
 // File Paths relativi e sicuri
 const opereFilePath = path.join(__dirname, 'Opere.json');
 const richiesteFilePath = path.join(__dirname, 'Richieste.json');
@@ -203,20 +196,6 @@ app.post('/RimuoviOpera', requireAuth, async (req, res) => {
 });
 
 
-
-// Visualizza Opere inserite dai Clienti
-/*app.get('/visualizzaOpere', requireAuth, (req, res) => {
-    try {
-        if (!fs.existsSync(richiesteFilePath)) return res.json([]);
-        const leggiFile = fs.readFileSync(richiesteFilePath, 'utf-8');
-        const opere = leggiFile ? JSON.parse(leggiFile) : [];
-        res.json(opere);
-    } catch (error) {
-        console.error('Errore lettura richieste:', error);
-        res.status(500).json({ message: 'Errore di lettura' });
-    }
-}); */
-
 // Report Acquisti Effettuati dai Clienti (Risolto bug di riferimento oggetti)
 app.get('/reportAcquisti', requireAuth, (req, res) => {
     try {
@@ -244,31 +223,7 @@ app.get('/reportAcquisti', requireAuth, (req, res) => {
     }
 });
 
-// Gestione Proposta di Vendita del Cliente
-app.post('/VendiOpera', requireAuth, async (req, res) => {
-    try {
-        console.log(req.body);
-        const newOpera = new VendiOpera({
-            nomeCliente: req.body.nomeCliente,
-            nome: req.body.nome,
-            prezzoVendita: req.body.prezzoVendita
-        });
-        await newOpera.save();
 
-        let richieste = [];
-        if (fs.existsSync(richiesteFilePath)) {
-            const leggiFile = fs.readFileSync(richiesteFilePath, 'utf-8');
-            richieste = leggiFile ? JSON.parse(leggiFile) : [];
-        }
-        richieste.push(newOpera);
-        fs.writeFileSync(richiesteFilePath, JSON.stringify(richieste, null, 2), 'utf-8');
-
-        res.json({ message: 'Richiesta inoltrata', riepilogo: req.body });
-    } catch (error) {
-        console.error('Errore inoltro vendita:', error);
-        res.status(500).json({ message: 'Errore di salvataggio' });
-    }
-});
 
 // Visualizza Scelte ed Esiti degli Stati
 app.get('/visualizzaSceltaClient', requireAuth, (req, res) => {

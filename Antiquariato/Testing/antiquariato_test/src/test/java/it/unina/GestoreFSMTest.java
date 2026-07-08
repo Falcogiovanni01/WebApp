@@ -1,6 +1,11 @@
 package it.unina;
 
+import it.unina.fsm.CoperturaFSM;
+import it.unina.fsm.CoperturaFSMExtension;
+import it.unina.fsm.Fsm;
+import it.unina.fsm.Transizione;
 import org.junit.jupiter.api.*;
+import org.junit.jupiter.api.extension.ExtendWith;
 import org.openqa.selenium.By;
 import org.openqa.selenium.WebDriver;
 import org.openqa.selenium.WebElement;
@@ -14,6 +19,8 @@ import java.time.Duration;
 import static org.junit.jupiter.api.Assertions.*;
 
 @TestInstance(TestInstance.Lifecycle.PER_CLASS)
+@ExtendWith(CoperturaFSMExtension.class)
+@CoperturaFSM(Fsm.GESTORE)
 @DisplayName("FSM Gestore: Automazione Selenium")
 public class GestoreFSMTest {
 
@@ -88,6 +95,7 @@ public class GestoreFSMTest {
 
         @Test
         @DisplayName("Transizione S0 -> S1 -> S0: Credenziali Errate")
+        @Transizione({"S0->S0"})
         void testLoginFallito() {
             // 1. Andiamo sulla pagina iniziale (Stato S0)
             driver.get(BASE_URL);
@@ -114,6 +122,7 @@ public class GestoreFSMTest {
         }
 
         @Test
+        @Transizione({"S0->S1", "S1->S2"})
         @DisplayName("Transizione S0 -> S1 -> S2: Credenziali Valide (Accesso Dashboard)")
         void testLoginSuccesso() {
             // 1. Partiamo sempre dallo stato iniziale
@@ -149,7 +158,16 @@ public class GestoreFSMTest {
     @DisplayName("Stato S1: Check Session e Persistenza Cookie (Gestore)")
     class S1_VerificaSessione_Gestore {
 
+        @BeforeEach
+        void puliziaCookie() {
+            // Senza questo reset, se una classe precedente lascia una sessione valida,
+            // driver.get(BASE_URL) carica la pagina già "loggata": l'overlay di login
+            // resta nascosto e #user non diventa mai visibile (TimeoutException).
+            driver.manage().deleteAllCookies();
+        }
+
         @Test
+        @Transizione({"S1->S2"})
         @DisplayName("Transizione S1 -> S2: Bypass del login con cookie valido")
         void testPersistenzaCookieGestore() {
             // 1. Andiamo sull'app Gestore e facciamo il login
@@ -177,6 +195,30 @@ public class GestoreFSMTest {
             
             System.out.println("[TEST SUPERATO] Transizione S1 -> S2 (Gestore) eseguita. Cookie validato e sessione persistente.");
         }
+
+        @Test
+        @Transizione({"S1->S0"})
+        @DisplayName("Transizione S1 -> S0: Cookie di sessione assente/non valido (Gestore)")
+        void testCookieNonValidoGestoreTornaAlLogin() {
+            // 1. Login valido per arrivare in S2
+            driver.get(BASE_URL);
+            WebElement userField = wait.until(ExpectedConditions.visibilityOfElementLocated(By.id("user")));
+            driver.findElement(By.id("pass")).sendKeys("admin");
+            userField.sendKeys("admin");
+            driver.findElement(By.cssSelector("#form-login-gestore button[type='submit']")).click();
+            wait.until(ExpectedConditions.visibilityOfElementLocated(By.id("form-aggiungi")));
+
+            // 2. Simuliamo la scadenza/invalidazione del cookie di sessione del gestore
+            driver.manage().deleteCookieNamed("gestoreSession");
+
+            // 3. Ricarichiamo: senza cookie valido, /checkSession deve rispondere 401
+            // e l'overlay di login deve ricomparire (stato S0)
+            driver.navigate().refresh();
+
+            WebElement loginForm = wait.until(ExpectedConditions.visibilityOfElementLocated(By.id("form-login-gestore")));
+            assertTrue(loginForm.isDisplayed(), "Senza un cookie di sessione valido, il sistema doveva tornare in S0 (Login Gestore).");
+            System.out.println("[TEST SUPERATO] Cookie assente/non valido: transizione S1 -> S0 (Gestore) confermata.");
+        }
     }
 
 
@@ -198,6 +240,7 @@ public class GestoreFSMTest {
 
         @Test
         @DisplayName("Transizioni Bidirezionali: S2 (Aggiungi) <-> S3 (Modifica)")
+        @Transizione({"S2->S3", "S3->S2"})
         void testNavigazioneTabs() {
             // 1. Troviamo i bottoni di navigazione (usando l'attributo data-target del tuo HTML)
             WebElement btnModifica = driver.findElement(By.cssSelector("button[data-target='tab-modifica']"));
@@ -222,6 +265,7 @@ public class GestoreFSMTest {
 
         @Test
         @DisplayName("Transizione S2 -> Report: Visualizzazione Report Acquisti")
+        @Transizione({"S2->S5", "S5->S5"})
         void testReportAcquisti() {
             // 1. Clicchiamo sulla tab Offerte / Report assicurandoci sia cliccabile
             WebElement btnOfferte = wait.until(ExpectedConditions.elementToBeClickable(By.cssSelector("button[data-target='tab-offerte']")));
@@ -244,6 +288,7 @@ public class GestoreFSMTest {
 
         @Test
         @DisplayName("Transizione S2 -> Report: Visualizzazione Report Vendite")
+        @Transizione({"S2->S5", "S5->S5"})
         void testReportVendite() {
             // 1. Clicchiamo sulla tab Offerte / Report
             WebElement btnOfferte = wait.until(ExpectedConditions.elementToBeClickable(By.cssSelector("button[data-target='tab-offerte']")));
@@ -268,6 +313,7 @@ public class GestoreFSMTest {
 
         @Test
         @DisplayName("Transizione S2 -> S0: Logout e Distruzione Sessione")
+        @Transizione({"S2->S0"})
         void testLogoutGestore() { // LA POST CONDIZIONE SAREBBE STATA QUELLA DI DISTRUGGERE IL COOKIE, MA NEL NOSTRO CASO LO CONSERVIAMO PER DUE ORE. 
             // 1. Siamo in S2. Troviamo il bottone di logout e lo clicchiamo.
           
@@ -286,6 +332,7 @@ public class GestoreFSMTest {
 
         @Test
     @DisplayName("Transizione S2 -> S2: Aggiunta Nuova Opera (Dinamica)")
+    @Transizione({"S2->S2"})
     void testAggiuntaNuovaOpera() {
         WebElement formAggiungi = wait.until(ExpectedConditions.visibilityOfElementLocated(By.id("form-aggiungi")));
 
@@ -323,6 +370,7 @@ public class GestoreFSMTest {
     // Questo test simula un tentativo di aggiunta senza compilare i campi richiesti, verificando che il form non venga inviato e che l'utente rimanga nello stato S2.
     @Test
         @DisplayName("Transizione S2 -> S2: Aggiunta Fallita (Campi Vuoti)")
+        @Transizione({"S2->S2"})
         void testAggiuntaFallita() {
             WebElement formAggiungi = wait.until(ExpectedConditions.visibilityOfElementLocated(By.id("form-aggiungi")));
             
@@ -358,6 +406,7 @@ public class GestoreFSMTest {
 
         @Test
         @DisplayName("Transizione S3 -> S3: Modifica Fallita (Opera Inesistente)")
+        @Transizione({"S2->S3", "S3->S3"}) 
         void testModificaFallita() {
             driver.findElement(By.cssSelector("button[data-target='tab-modifica']")).click();
             WebElement formModifica = wait.until(ExpectedConditions.visibilityOfElementLocated(By.id("form-modifica")));
@@ -374,6 +423,7 @@ public class GestoreFSMTest {
 
         @Test
         @DisplayName("Transizione S3 -> S3: Modifica Avvenuta con Successo")
+        @Transizione({"S2->S3", "S3->S3"})
         void testModificaSuccesso() {
             driver.findElement(By.cssSelector("button[data-target='tab-modifica']")).click();
             WebElement formModifica = wait.until(ExpectedConditions.visibilityOfElementLocated(By.id("form-modifica")));
@@ -408,6 +458,7 @@ public class GestoreFSMTest {
 
         @Test
         @DisplayName("Transizione S4 -> S4: Rimozione Avvenuta con Successo")
+        @Transizione({"S2->S4","S4->S4"})
         void testRimozioneSuccesso() {
             driver.findElement(By.cssSelector("button[data-target='tab-rimuovi']")).click();
             WebElement formRimuovi = wait.until(ExpectedConditions.visibilityOfElementLocated(By.id("form-rimuovi")));
@@ -438,8 +489,9 @@ public class GestoreFSMTest {
 
         @Test
         @DisplayName("Transizione S4 -> S4: Rimozione Fallita (Codice Inesistente)")
+        @Transizione({"S2->S4","S4->S4"})
         void testRimozioneFallita() {
-            driver.findElement(By.cssSelector("button[data-target='tab-rimuovi']")).click();
+                driver.findElement(By.cssSelector("button[data-target='tab-rimuovi']")).click();
             WebElement formRimuovi = wait.until(ExpectedConditions.visibilityOfElementLocated(By.id("form-rimuovi")));
 
             // Testiamo il backend inserendo un codice che non esiste

@@ -3,9 +3,11 @@ const fs = require('fs');
 const path = require('path');
 const mongoose = require('mongoose');
 const cookieParser = require('cookie-parser');
+const bcrypt = require('bcryptjs');
 
 const app = express();
 const PORT = 3001;
+const SALT_ROUNDS = 10;
 
 // Nome della cartella contenente i file statici del client
 const STATIC_DIR = path.join(__dirname, 'Client'); 
@@ -17,7 +19,7 @@ app.use(express.json());
 app.use(cookieParser());
 
 // ============================================================
-// Middleware di autenticazione basato SOLO sul cookie
+// FIX #1: Middleware di autenticazione basato SOLO sul cookie
 // di sessione (stesso pattern già usato in ServerGestore.js).
 // Da qui in poi, l'identità dell'utente per ogni operazione
 // protetta viene letta da req.nomeAutenticato, mai da req.body.
@@ -32,7 +34,7 @@ function requireClienteAuth(req, res, next) {
 }
 
 // ============================================================
-// Mantenuto - Route esplicita per la home page cliente
+// FIX #2: Mantenuto - Route esplicita per la home page cliente
 // ============================================================
 app.get('/', (req, res) => {
   res.sendFile(path.join(STATIC_DIR, 'Cliente.html'));
@@ -46,18 +48,27 @@ mongoose.connect('mongodb://127.0.0.1:27017/Cliente')
 // --- SCHEMAS E MODELLI ---
 
 const ClienteSchema = new mongoose.Schema({
-  nome: String,
-  password: String,
-  numero: String,
-  carta: String
+  nome: { type: String, required: true, unique: true, trim: true },
+  password: { type: String, required: true },
+  numero: {
+    type: String,
+    required: true,
+    unique: true,
+    validate: {
+      validator: (v) => /^\d{10}$/.test(v),
+      message: (props) => `Numero di telefono non valido ('${props.value}'): deve contenere esattamente 10 cifre.`
+    }
+  },
+  carta: {
+    type: String,
+    required: true,
+    validate: {
+      validator: (v) => /^\d{16}$/.test(v),
+      message: (props) => `Numero di carta non valido: deve contenere esattamente 16 cifre.`
+    }
+  }
 });
 const Cliente = mongoose.model('Cliente', ClienteSchema);
-
-const LoginSchema = new mongoose.Schema({
-  nome: String,
-  password: String
-});
-const LoginCliente = mongoose.model('LoginCliente', LoginSchema);
 
 const CarrelloSchema = new mongoose.Schema({
   nome: String,
@@ -149,22 +160,39 @@ function safeAppendToJsonFile(filePath, newItem) {
 // REGISTRAZIONE
 app.post('/registrazione', async (req, res) => {
   try {
+    // FIX #4: la password non viene più salvata in chiaro. bcryptjs è puro JS
+    // (nessuna compilazione nativa richiesta), scelto apposta per restare
+    // facilmente replicabile su qualunque macchina senza toolchain C++.
+    const passwordHash = await bcrypt.hash(req.body.password, SALT_ROUNDS);
+
     const newCliente = new Cliente({
       nome: req.body.nome,
-      password: req.body.password,
+      password: passwordHash,
       numero: req.body.numero,
       carta: req.body.carta
     });
     await newCliente.save();
     console.log('Utente aggiunto nel DB');
 
-    const newLogin = new LoginCliente({ nome: newCliente.nome, password: newCliente.password });
-    await newLogin.save();
-    
-    const riepilogo = `UTENTE REGISTRATO nome:${newCliente.nome} password:${newCliente.password} numero:${newCliente.numero} carta:${newCliente.carta}`;
+    // Non ripetiamo più la password (nemmeno l'hash) nella risposta al client.
+    const riepilogo = `UTENTE REGISTRATO nome:${newCliente.nome} numero:${newCliente.numero} carta:${newCliente.carta}`;
     res.json({ riepilogo });
   } catch (err) {
     console.error('Errore durante la registrazione:', err);
+
+    // Violazione di un vincolo 'unique' (nome o numero già registrati)
+    if (err.code === 11000) {
+      const campo = Object.keys(err.keyPattern || err.keyValue || {})[0] || 'dato';
+      const nomeCampo = campo === 'nome' ? 'nome utente' : campo === 'numero' ? 'numero di telefono' : campo;
+      return res.status(409).json({ message: `Registrazione fallita: ${nomeCampo} già in uso.` });
+    }
+
+    // Errore di validazione Mongoose (es. numero non a 10 cifre, carta non a 16 cifre)
+    if (err.name === 'ValidationError') {
+      const primoErrore = Object.values(err.errors)[0];
+      return res.status(400).json({ message: primoErrore.message });
+    }
+
     res.status(500).json({ message: 'Errore durante la registrazione' });
   }
 });
@@ -175,9 +203,16 @@ app.post('/registrazione', async (req, res) => {
 // LOGIN
 app.post('/login', async (req, res) => {
   const { nome, password } = req.body;
-// try {
-    const result = await LoginCliente.findOne({ nome, password });
-    if (result) {
+  try {
+    // FIX #4: non possiamo più cercare {nome, password} in un colpo solo,
+    // perché la password è ora un hash: cerchiamo prima l'utente per nome,
+    // poi confrontiamo la password in chiaro ricevuta con l'hash salvato.
+    // (LoginCliente è stata rimossa: Cliente è ora l'unica fonte di verità
+    // per le credenziali, niente più rischio di disallineamento tra due tabelle.)
+    const result = await Cliente.findOne({ nome });
+    const credenzialiValide = result && await bcrypt.compare(password, result.password);
+
+    if (credenzialiValide) {
       console.log('Accesso effettuato da:', nome);
 
       // Scrittura del cookie di sessione (FSM Stato S2)
@@ -191,11 +226,10 @@ app.post('/login', async (req, res) => {
       console.log('Credenziali non valide');
       res.status(401).json({ message: 'Credenziali non valide' });
     }
- // } 
- /* catch (err) {
+  } catch (err) {
     console.error('Errore durante il login:', err);
     res.status(500).json({ message: 'Errore durante il login' });
-  }*/
+  }
 });
 
 // CHECK SESSION 

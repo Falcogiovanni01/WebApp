@@ -1,6 +1,11 @@
 package it.unina;
 
+import it.unina.fsm.CoperturaFSM;
+import it.unina.fsm.CoperturaFSMExtension;
+import it.unina.fsm.Fsm;
+import it.unina.fsm.Transizione;
 import org.junit.jupiter.api.*;
+import org.junit.jupiter.api.extension.ExtendWith;
 import org.openqa.selenium.By;
 import org.openqa.selenium.JavascriptExecutor;
 import org.openqa.selenium.WebDriver;
@@ -21,21 +26,23 @@ import java.time.Duration;
 import static org.junit.jupiter.api.Assertions.*;
 
 @TestInstance(TestInstance.Lifecycle.PER_CLASS)
+@ExtendWith(CoperturaFSMExtension.class)
+@CoperturaFSM(Fsm.CLIENTE)
 @DisplayName("FSM Cliente: Automazione Selenium")
 public class ClienteFSMTest {
 
     private WebDriver driver;
     private WebDriverWait wait;
-    
+
     // Porta del server Cliente
-    private final String BASE_URL = "http://localhost:3001"; 
-    
+    private final String BASE_URL = "http://localhost:3001";
+
     // Inserisci qui le credenziali fisse del tuo utente di test nel DB
     private final String USER_TEST = "PROVA UTENTE";
     private final String PASS_TEST = "Prov@1000";
 
     // DA NOTARE IL PUNTO 2 E IL PUNTO 3 SONO STATI NECESSARI AI FINI DI UNA MIGLIORE ESPERIENZA DI TESTING AUTOMATIZZATO CON CHROME DRIVER
-    // LA loro assenza generava un errore 
+    // LA loro assenza generava un errore
     @BeforeAll
     void setUp() {
         // FIX #3: garantiamo che l'utente di test esista nel DB, indipendentemente
@@ -50,7 +57,7 @@ public class ClienteFSMTest {
         prefs.put("credentials_enable_service", false);
         prefs.put("profile.password_manager_enabled", false);
         options.setExperimentalOption("prefs", prefs);
-        
+
         // 3. Nasconde la fastidiosa barra "Chrome è controllato da un software automatizzato"
         options.setExperimentalOption("excludeSwitches", new String[]{"enable-automation"});
 
@@ -140,7 +147,7 @@ public class ClienteFSMTest {
 
 
     // --- SUITE DI TEST ---
-    // NOTA : AGGIUNGERE REGISTRAIONE !!!!!!! 
+    // NOTA : AGGIUNGERE REGISTRAIONE !!!!!!!
     @Nested
     @DisplayName("Stato S0 e S3: Accesso e Registrazione")
     class S0_S3_AccessoPubblico {
@@ -152,6 +159,7 @@ public class ClienteFSMTest {
 
         @Test
         @DisplayName("Transizione S0 -> S3 -> S0: Navigazione Form")
+        @Transizione({"S0->S3", "S3->S0"})
         void testNavigazioneRegistrazione() {
             WebElement btnVaiRegistrazione = wait.until(ExpectedConditions.elementToBeClickable(By.id("link-show-register")));
             btnVaiRegistrazione.click();
@@ -169,6 +177,7 @@ public class ClienteFSMTest {
 
         @Test
         @DisplayName("Transizione S0 -> S0: Credenziali Errate (Negative Path)")
+        @Transizione({"S0->S0"})
         void testLoginFallito() {
             WebElement userField = wait.until(ExpectedConditions.visibilityOfElementLocated(By.cssSelector("input[data-testid='login-username']")));
             WebElement passField = driver.findElement(By.cssSelector("input[data-testid='login-password']"));
@@ -186,6 +195,7 @@ public class ClienteFSMTest {
 
         @Test
         @DisplayName("Transizione S0 -> S1 -> S2: Login Valido (Accesso Catalogo)")
+        @Transizione({"S0->S1", "S1->S2"})
         void testLoginSuccesso() {
             WebElement userField = wait.until(ExpectedConditions.visibilityOfElementLocated(By.cssSelector("input[data-testid='login-username']")));
             WebElement passField = driver.findElement(By.cssSelector("input[data-testid='login-password']"));
@@ -217,42 +227,50 @@ public class ClienteFSMTest {
 
         @Test
         @DisplayName("Transizione S3 -> S0: Registrazione Avvenuta con Successo")
+        @Transizione({"S3->S0"})
         void testRegistrazioneSuccesso() {
             driver.get(BASE_URL);
             // 1. Vai in S3
             driver.findElement(By.id("link-show-register")).click();
             wait.until(ExpectedConditions.visibilityOfElementLocated(By.id("form-register")));
 
-            // 2. Generiamo dati casuali per evitare conflitti con utenti già esistenti
-            String username = "NuovoUtente_" + System.currentTimeMillis();
-            
+            // 2. Generiamo dati casuali per evitare conflitti con utenti già esistenti.
+            // FIX: anche il numero di telefono deve essere randomizzato, non solo lo
+            // username. Da quando 'numero' ha un vincolo unique nel DB, riusare un
+            // valore fisso qui avrebbe fatto fallire la registrazione a ogni run
+            // successivo alla prima (numero già in uso da un'esecuzione precedente).
+            long timestamp = System.currentTimeMillis();
+            String username = "NuovoUtente_" + timestamp;
+            String telefonoUnico = "3" + String.format("%09d", timestamp % 1_000_000_000L);
+
             // 3. Compiliamo il form di registrazione
             driver.findElement(By.cssSelector("input[data-testid='reg-username']")).sendKeys(username);
             driver.findElement(By.cssSelector("input[data-testid='reg-password']")).sendKeys("password123");
-            driver.findElement(By.cssSelector("input[data-testid='reg-phone']")).sendKeys("3330001122");
+            driver.findElement(By.cssSelector("input[data-testid='reg-phone']")).sendKeys(telefonoUnico);
             driver.findElement(By.cssSelector("input[data-testid='reg-card']")).sendKeys("1234567890123456");
-            
+
             driver.findElement(By.cssSelector("button[data-testid='reg-submit']")).click();
 
             // 4. Gestiamo l'alert di successo
-            try { 
-                wait.until(ExpectedConditions.alertIsPresent()); 
-                driver.switchTo().alert().accept(); 
+            try {
+                wait.until(ExpectedConditions.alertIsPresent());
+                driver.switchTo().alert().accept();
             } catch (Exception e) {}
 
             // 5. Verifica: il sistema ci riporta al login (S0)
             WebElement formLogin = wait.until(ExpectedConditions.visibilityOfElementLocated(By.id("form-login")));
             assertTrue(formLogin.isDisplayed(), "La registrazione doveva riportare l'utente allo stato S0 (Login).");
-            
+
             System.out.println("[TEST SUPERATO] Registrazione completata per l'utente: " + username);
         }
 
     @Test
     @DisplayName("S3: Registrazione con campi vuoti (Negative Path)")
+    @Transizione({"S3->S3"})
     void testRegistrazioneCampiVuoti() {
         driver.get(BASE_URL);
         driver.findElement(By.id("link-show-register")).click();
-        
+
         // Non inviamo alcun dato, clicchiamo solo submit
         driver.findElement(By.cssSelector("button[data-testid='reg-submit']")).click();
 
@@ -273,6 +291,7 @@ public class ClienteFSMTest {
 
         @Test
         @DisplayName("Transizione S1 -> S2: Bypass del login con cookie/storage validi")
+        @Transizione({"S1->S2"})
         void testPersistenzaSessione() {
             eseguiLoginDiSupporto();
 
@@ -287,6 +306,7 @@ public class ClienteFSMTest {
 
         @Test
         @DisplayName("Transizione S1 -> S0: Cookie di sessione assente/non valido")
+        @Transizione({"S1->S0"})
         void testCookieNonValidoTornaAlLogin() {
             // 1. Partiamo da uno stato autenticato (S2), per assicurarci che il test
             // stia davvero verificando una transizione e non un semplice stato iniziale.
@@ -320,6 +340,7 @@ public class ClienteFSMTest {
 
         @Test
         @DisplayName("Transizioni Bidirezionali: S2 (Catalogo) <-> S4 (Carrello)")
+        @Transizione({"S2->S4", "S4->S2"})
         void testNavigazioneCatalogoCarrello() {
             WebElement btnCarrello = driver.findElement(By.cssSelector("button[data-target='tab-carrello']"));
             WebElement btnCatalogo = driver.findElement(By.cssSelector("button[data-target='tab-catalogo']"));
@@ -349,19 +370,25 @@ public class ClienteFSMTest {
 
       @Test
         @DisplayName("Flusso S2 -> S4: Aggiunta e Rimozione dal Carrello")
+        @Transizione({"S2->S4", "S4->S4", "S4->S2", "S2->S2"})
+        // NOTA: include anche le transizioni del blocco di pre-pulizia (S2->S4 per
+        // entrare nel carrello, S4->S4 per rimuovere eventuali residui, S4->S2 per
+        // tornare al catalogo), perché è stato deciso di contare come "verificate"
+        // anche le azioni UI reali dentro il corpo del test, non solo quelle seguite
+        // da un assert esplicito.
         void testAggiungiERimuoviCarrello() {
             // --- FASE DI PRE-PULIZIA (Garantisce l'isolamento del test) ---
             driver.findElement(By.cssSelector("button[data-target='tab-carrello']")).click();
             wait.until(ExpectedConditions.visibilityOfElementLocated(By.id("tab-carrello")));
-            
+
             // Se ci sono già opere nel carrello, rimuoviamole tutte cliccando in loop
             java.util.List<WebElement> bottoniRimuovi = driver.findElements(By.xpath("//button[contains(text(), 'Rimuovi')]"));
             for (int i = 0; i < bottoniRimuovi.size(); i++) {
                 wait.until(ExpectedConditions.elementToBeClickable(By.xpath("(//button[contains(text(), 'Rimuovi')])[1]"))).click();
                 // Breve pausa per permettere al fetch di Node.js di aggiornare il DOM
-                try { Thread.sleep(300); } catch (Exception e) {} 
+                try { Thread.sleep(300); } catch (Exception e) {}
             }
-            
+
             // Torniamo al catalogo per iniziare il test vero e proprio
             driver.findElement(By.cssSelector("button[data-target='tab-catalogo']")).click();
             wait.until(ExpectedConditions.visibilityOfElementLocated(By.id("tab-catalogo")));
@@ -389,6 +416,9 @@ public class ClienteFSMTest {
 
         @Test
         @DisplayName("Flusso End-to-End: S2 -> S4 -> Acquisto Definitivo")
+        @Transizione({"S2->S2", "S2->S4", "S4->S4"})
+        // NOTA: "S2->S2" corrisponde al click su "Aggiungi al Carrello" fatto dal
+        // catalogo prima di spostarsi nel carrello; mancava nella versione precedente.
         void testFlussoAcquisto() {
             // 1. Aggiungiamo al carrello
             WebElement btnAggiungi = wait.until(ExpectedConditions.elementToBeClickable(By.xpath("//button[contains(text(), 'Aggiungi al Carrello')]")));
@@ -412,6 +442,11 @@ public class ClienteFSMTest {
 
         @Test
         @DisplayName("Transizione S2/S4 -> S0: Logout Cliente")
+        @Transizione({"S2->S0"})
+        // NOTA: qui viene testato solo il logout dalla tab di default (S2, Catalogo),
+        // perché eseguiLoginDiSupporto() atterra sempre su S2 e il corpo del test
+        // non naviga verso S4 prima di cliccare logout. "S4->S0" resta scoperto
+        // finché non si scrive un test dedicato che fa logout dal carrello.
         void testLogoutCliente() {
             WebElement logoutButton = wait.until(ExpectedConditions.elementToBeClickable(By.id("btn-logout")));
             logoutButton.click();
