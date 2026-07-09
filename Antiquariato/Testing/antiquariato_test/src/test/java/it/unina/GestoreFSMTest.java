@@ -13,6 +13,11 @@ import org.openqa.selenium.chrome.ChromeDriver;
 import org.openqa.selenium.chrome.ChromeOptions;
 import org.openqa.selenium.support.ui.ExpectedConditions;
 import org.openqa.selenium.support.ui.WebDriverWait;
+import com.mongodb.client.MongoClient;
+import com.mongodb.client.MongoClients;
+import com.mongodb.client.MongoCollection;
+import com.mongodb.client.model.Filters;
+import org.bson.Document;
 
 import java.time.Duration;
 
@@ -48,6 +53,21 @@ public class GestoreFSMTest {
         formAggiungi.findElement(By.name("prezzo")).sendKeys("150");
         formAggiungi.findElement(By.cssSelector("button[data-testid='btn-submit-aggiungi']")).click();
         try { wait.until(ExpectedConditions.alertIsPresent()); driver.switchTo().alert().accept(); } catch (Exception e) {}
+    }
+
+     // ============================================================
+    // Verifica di persistenza reale su MongoDB, non solo sull'interfaccia.
+    // Apre una connessione diretta (indipendente da quella usata dal server
+    // Express, che gira nel suo processo separato tramite mongoose) e
+    // interroga la stessa collezione "operas" (nome derivato dalla
+    // pluralizzazione automatica di Mongoose sul modello "Opera").
+    // Ritorna null se l'opera non esiste nel DB.
+    // ============================================================
+    private Document trovaOperaNelDB(String codice) {
+        try (MongoClient mongoClient = MongoClients.create("mongodb://127.0.0.1:27017")) {
+            MongoCollection<Document> operas = mongoClient.getDatabase("Gestore").getCollection("operas");
+            return operas.find(Filters.eq("codice", codice)).first();
+        }
     }
 
     @BeforeAll
@@ -171,20 +191,8 @@ public class GestoreFSMTest {
         @DisplayName("Transizione S1 -> S2: Bypass del login con cookie valido")
         void testPersistenzaCookieGestore() {
             // 1. Andiamo sull'app Gestore e facciamo il login
-            driver.get(BASE_URL);
-
-            WebElement userField = wait.until(ExpectedConditions.visibilityOfElementLocated(By.id("user")));
-            WebElement passField = driver.findElement(By.id("pass"));
-            WebElement loginButton = driver.findElement(By.cssSelector("#form-login-gestore button[type='submit']"));
-
-            // Credenziali reali del gestore
-            userField.sendKeys("admin");
-            passField.sendKeys("admin");
-            loginButton.click();
-
-            // Aspettiamo di essere in S2 (Dashboard)
-            wait.until(ExpectedConditions.visibilityOfElementLocated(By.id("form-aggiungi")));
-
+         
+            loginDiSupporto(); // Questo metodo cancella i cookie residui e fa il login, portandoci in S2.
             // 2. SIMULIAMO IL RIENTRO (Ricaricamento pagina)
             driver.navigate().refresh();
 
@@ -200,19 +208,11 @@ public class GestoreFSMTest {
         @Transizione({"S1->S0"})
         @DisplayName("Transizione S1 -> S0: Cookie di sessione assente/non valido (Gestore)")
         void testCookieNonValidoGestoreTornaAlLogin() {
-            // 1. Login valido per arrivare in S2
-            driver.get(BASE_URL);
-            WebElement userField = wait.until(ExpectedConditions.visibilityOfElementLocated(By.id("user")));
-            driver.findElement(By.id("pass")).sendKeys("admin");
-            userField.sendKeys("admin");
-            driver.findElement(By.cssSelector("#form-login-gestore button[type='submit']")).click();
-            wait.until(ExpectedConditions.visibilityOfElementLocated(By.id("form-aggiungi")));
-
-            // 2. Simuliamo la scadenza/invalidazione del cookie di sessione del gestore
-            driver.manage().deleteCookieNamed("gestoreSession");
-
-            // 3. Ricarichiamo: senza cookie valido, /checkSession deve rispondere 401
-            // e l'overlay di login deve ricomparire (stato S0)
+            // 1. Andiamo sull'app Gestore e facciamo il login
+            loginDiSupporto();
+            // 2. Ora cancelliamo i cookie per simulare una sessione scaduta o assente
+            driver.manage().deleteAllCookies();
+            // 3. Ricarichiamo la pagina per forzare il sistema a verificare la sessione
             driver.navigate().refresh();
 
             WebElement loginForm = wait.until(ExpectedConditions.visibilityOfElementLocated(By.id("form-login-gestore")));
@@ -363,6 +363,13 @@ public class GestoreFSMTest {
         }
 
         assertTrue(formAggiungi.isDisplayed(), "Il sistema deve rimanere nello stato S2 dopo l'aggiunta.");
+         // DB, non solo mostrata come "successo" dall'alert del browser.
+        Document operaCreata = trovaOperaNelDB(codiceUnivoco);
+        assertNotNull(operaCreata, "L'opera doveva essere stata realmente scritta nel DB, non solo mostrata come successo dall'alert.");
+        assertEquals("150", operaCreata.getString("prezzo"), "Il prezzo salvato nel DB doveva corrispondere a quello inserito nel form.");
+ 
+       
+       
         System.out.println("[TEST SUPERATO] Inserita opera dinamica nel database, pronta per l'acquisto.");
     }
 
@@ -433,9 +440,18 @@ public class GestoreFSMTest {
             formModifica.findElement(By.name("prezzo")).sendKeys("9999");
             formModifica.findElement(By.cssSelector("button[data-testid='btn-submit-modifica']")).click();
 
-            try { wait.until(ExpectedConditions.alertIsPresent()); driver.switchTo().alert().accept(); } catch (Exception e) {}
+            try {      
+            wait.until(ExpectedConditions.alertIsPresent()); driver.switchTo().alert().accept();
+            } catch (Exception e) {}
 
             assertTrue(formModifica.isDisplayed(), "Il sistema doveva restare in S3.");
+
+             // Verifica di persistenza: il prezzo deve essere stato realmente
+            // aggiornato in MongoDB, non solo mostrato come "successo" dall'alert.
+            Document operaAggiornata = trovaOperaNelDB(codiceTest);
+            assertNotNull(operaAggiornata, "L'opera modificata doveva ancora esistere nel DB.");
+            assertEquals("9999", operaAggiornata.getString("prezzo"), "Il prezzo nel DB doveva riflettere la modifica, non solo l'alert di conferma.");
+
             System.out.println("[TEST SUPERATO] Modifica avvenuta con successo per opera esistente.");
         }
     }
@@ -470,6 +486,13 @@ public class GestoreFSMTest {
             try { wait.until(ExpectedConditions.alertIsPresent()); driver.switchTo().alert().accept(); } catch (Exception e) {}
 
             assertTrue(formRimuovi.isDisplayed(), "Il sistema doveva restare in S4 dopo l'eliminazione.");
+          
+          
+            // Verifica di persistenza: l'opera deve essere stata realmente rimossa
+            // da MongoDB, non solo scomparsa dall'interfaccia.
+            Document operaRimossa = trovaOperaNelDB(codiceTest);
+            assertNull(operaRimossa, "L'opera doveva essere stata rimossa realmente dal DB, non solo dall'interfaccia.");
+ 
             System.out.println("[TEST SUPERATO] L'opera " + codiceTest + " è stata rimossa correttamente.");
         }
         

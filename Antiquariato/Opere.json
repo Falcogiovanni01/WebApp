@@ -1,31 +1,5 @@
 [
   {
-    "codice": "MOD-1783351552755",
-    "nome": "Opera da Modificare",
-    "descrizione": "",
-    "prezzo": "150",
-    "immagine1": [],
-    "immagine2": [],
-    "immagine3": [],
-    "immagine4": [],
-    "tecnica": "",
-    "_id": "6a4bc9012b68ce0c46d419aa",
-    "__v": 0
-  },
-  {
-    "codice": "MOD-1783351554312",
-    "nome": "Titolo Modificato!",
-    "descrizione": "",
-    "prezzo": "9999",
-    "immagine1": [],
-    "immagine2": [],
-    "immagine3": [],
-    "immagine4": [],
-    "tecnica": "",
-    "_id": "6a4bc9022b68ce0c46d419ad",
-    "__v": 0
-  },
-  {
     "codice": "DEL-1783352513844",
     "nome": "Opera da Rimuovere",
     "descrizione": "",
@@ -169,6 +143,60 @@
     "prezzo": "9999",
     "tecnica": "",
     "_id": "6a4e7ee7c5f6e5d2e3976b49",
+    "__v": 0
+  },
+  {
+    "codice": "TEST-1783608250714",
+    "nome": "Opera Autogenerata",
+    "descrizione": "Opera creata da Selenium per test automatizzato",
+    "prezzo": "150",
+    "tecnica": "Automazione",
+    "_id": "6a4fb3ba1fb62cf34fdbf6da",
+    "__v": 0
+  },
+  {
+    "codice": "MOD-1783608252783",
+    "nome": "Opera da Modificare",
+    "descrizione": "",
+    "prezzo": "150",
+    "tecnica": "",
+    "_id": "6a4fb3bc10cb62767b25649b",
+    "__v": 0
+  },
+  {
+    "codice": "MOD-1783608254112",
+    "nome": "Titolo Modificato!",
+    "descrizione": "",
+    "prezzo": "9999",
+    "tecnica": "",
+    "_id": "6a4fb3be06455381b2058561",
+    "__v": 0
+  },
+  {
+    "codice": "TEST-1783608267737",
+    "nome": "Opera Autogenerata",
+    "descrizione": "Opera creata da Selenium per test automatizzato",
+    "prezzo": "150",
+    "tecnica": "Automazione",
+    "_id": "6a4fb3cbc4f9b0bc33787c01",
+    "__v": 0
+  },
+  {
+    "codice": "MOD-1783608269302",
+    "nome": "Opera da Modificare",
+    "descrizione": "",
+    "prezzo": "150",
+    "tecnica": "",
+    "_id": "6a4fb3cdc58489b9ae272c7f",
+    "__v": 0
+  },
+  {
+    "codice": "MOD-1783608270629",
+    "nome": "Titolo Modificato!",
+    "descrizione": "",
+    "prezzo": "9999",
+    "tecnica": "",
+    "_id": "6a4fb3cecd8abda8c49a61ef",
     "__v": 0
   }
 ]

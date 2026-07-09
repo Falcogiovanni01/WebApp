@@ -15,6 +15,12 @@ import org.openqa.selenium.chrome.ChromeOptions;
 import org.openqa.selenium.support.ui.ExpectedConditions;
 import org.openqa.selenium.support.ui.WebDriverWait;
 
+import com.mongodb.client.MongoClient;
+import com.mongodb.client.MongoClients;
+import com.mongodb.client.MongoCollection;
+import com.mongodb.client.model.Filters;
+import com.mongodb.client.model.Sorts;
+
 import java.net.URI;
 import java.net.URLEncoder;
 import java.net.http.HttpClient;
@@ -22,6 +28,7 @@ import java.net.http.HttpRequest;
 import java.net.http.HttpResponse;
 import java.nio.charset.StandardCharsets;
 import java.time.Duration;
+import org.bson.Document;
 
 import static org.junit.jupiter.api.Assertions.*;
 
@@ -41,38 +48,7 @@ public class ClienteFSMTest {
     private final String USER_TEST = "PROVA UTENTE";
     private final String PASS_TEST = "Prov@1000";
 
-    // DA NOTARE IL PUNTO 2 E IL PUNTO 3 SONO STATI NECESSARI AI FINI DI UNA MIGLIORE ESPERIENZA DI TESTING AUTOMATIZZATO CON CHROME DRIVER
-    // LA loro assenza generava un errore
-    @BeforeAll
-    void setUp() {
-        // FIX #3: garantiamo che l'utente di test esista nel DB, indipendentemente
-        // da quale macchina/DB venga usato per eseguire la suite (niente più
-        // precondizioni manuali da creare a mano prima di 'mvn test').
-        assicuraUtenteDiTest();
-
-        ChromeOptions options = new ChromeOptions();
-        options.addArguments("--remote-allow-origins=*");
-        // 2. Disattiva il pop-up "Vuoi salvare la password?" e l'autofill
-        java.util.Map<String, Object> prefs = new java.util.HashMap<>();
-        prefs.put("credentials_enable_service", false);
-        prefs.put("profile.password_manager_enabled", false);
-        options.setExperimentalOption("prefs", prefs);
-
-        // 3. Nasconde la fastidiosa barra "Chrome è controllato da un software automatizzato"
-        options.setExperimentalOption("excludeSwitches", new String[]{"enable-automation"});
-
-        driver = new ChromeDriver(options);
-        wait = new WebDriverWait(driver, Duration.ofSeconds(10));
-    }
-
-    @AfterAll
-    void tearDown() {
-        if (driver != null) {
-            driver.quit();
-        }
-    }
-
-    // ============================================================
+     // ============================================================
     // FIX #3: Provisioning automatico dell'utente di test.
     // Non usa Selenium: è una chiamata HTTP diretta al server Cliente,
     // eseguita una sola volta prima di aprire il browser. Rende la suite
@@ -146,8 +122,71 @@ public class ClienteFSMTest {
     }
 
 
+
+    // ============================================================
+    // Verifiche di persistenza reale su MongoDB, non solo sull'interfaccia.
+    // DB "Cliente" (da mongoose.connect nel server), collezioni derivate dalla
+    // pluralizzazione automatica di Mongoose sui modelli "Cliente", "Ordine"
+    // e "Carrello". Nota: la password NON è verificabile qui perché è salvata
+    // come hash bcrypt one-way (FIX #4 lato server) — per quella servirebbe
+    // un round-trip HTTP di login, non una query diretta.
+    // ============================================================
+    private Document trovaClienteNelDB(String nome) {
+        try (MongoClient mongoClient = MongoClients.create("mongodb://127.0.0.1:27017")) {
+            MongoCollection<Document> clienti = mongoClient.getDatabase("Cliente").getCollection("clientes");
+            return clienti.find(Filters.eq("nome", nome)).first();
+        }
+    }
+ 
+    private Document trovaUltimoOrdineNelDB(String utente) {
+        try (MongoClient mongoClient = MongoClients.create("mongodb://127.0.0.1:27017")) {
+            MongoCollection<Document> ordini = mongoClient.getDatabase("Cliente").getCollection("ordines");
+            return ordini.find(Filters.eq("utente", utente)).sort(Sorts.descending("_id")).first();
+        }
+    }
+ 
+    private long contaCarrelloNelDB(String nome) {
+        try (MongoClient mongoClient = MongoClients.create("mongodb://127.0.0.1:27017")) {
+            MongoCollection<Document> carrello = mongoClient.getDatabase("Cliente").getCollection("carrellos");
+            return carrello.countDocuments(Filters.eq("nome", nome));
+        }
+    }
+
+
+
+    // DA NOTARE IL PUNTO 2 E IL PUNTO 3 SONO STATI NECESSARI AI FINI DI UNA MIGLIORE ESPERIENZA DI TESTING AUTOMATIZZATO CON CHROME DRIVER
+    // LA loro assenza generava un errore
+    @BeforeAll
+    void setUp() {
+        // FIX #3: garantiamo che l'utente di test esista nel DB, indipendentemente
+        // da quale macchina/DB venga usato per eseguire la suite (niente più
+        // precondizioni manuali da creare a mano prima di 'mvn test').
+        assicuraUtenteDiTest();
+
+        ChromeOptions options = new ChromeOptions();
+        options.addArguments("--remote-allow-origins=*");
+        // 2. Disattiva il pop-up "Vuoi salvare la password?" e l'autofill
+        java.util.Map<String, Object> prefs = new java.util.HashMap<>();
+        prefs.put("credentials_enable_service", false);
+        prefs.put("profile.password_manager_enabled", false);
+        options.setExperimentalOption("prefs", prefs);
+
+        // 3. Nasconde la fastidiosa barra "Chrome è controllato da un software automatizzato"
+        options.setExperimentalOption("excludeSwitches", new String[]{"enable-automation"});
+
+        driver = new ChromeDriver(options);
+        wait = new WebDriverWait(driver, Duration.ofSeconds(10));
+    }
+
+    @AfterAll
+    void tearDown() {
+        if (driver != null) {
+            driver.quit();
+        }
+    }
+
+
     // --- SUITE DI TEST ---
-    // NOTA : AGGIUNGERE REGISTRAIONE !!!!!!!
     @Nested
     @DisplayName("Stato S0 e S3: Accesso e Registrazione")
     class S0_S3_AccessoPubblico {
@@ -260,6 +299,14 @@ public class ClienteFSMTest {
             // 5. Verifica: il sistema ci riporta al login (S0)
             WebElement formLogin = wait.until(ExpectedConditions.visibilityOfElementLocated(By.id("form-login")));
             assertTrue(formLogin.isDisplayed(), "La registrazione doveva riportare l'utente allo stato S0 (Login).");
+
+            // Verifica di persistenza: l'utente deve essere stato realmente scritto
+            // nel DB, non solo mostrato come "successo" dall'alert del browser.
+            // La password non è verificabile qui perché salvata come hash bcrypt.
+            Document clienteCreato = trovaClienteNelDB(username);
+            assertNotNull(clienteCreato, "L'utente doveva essere stato realmente scritto nel DB, non solo mostrato come successo dall'alert.");
+            assertEquals(telefonoUnico, clienteCreato.getString("numero"), "Il numero di telefono salvato nel DB doveva corrispondere a quello inserito nel form.");
+ 
 
             System.out.println("[TEST SUPERATO] Registrazione completata per l'utente: " + username);
         }
@@ -381,12 +428,14 @@ public class ClienteFSMTest {
             driver.findElement(By.cssSelector("button[data-target='tab-carrello']")).click();
             wait.until(ExpectedConditions.visibilityOfElementLocated(By.id("tab-carrello")));
 
-            // Se ci sono già opere nel carrello, rimuoviamole tutte cliccando in loop
-            java.util.List<WebElement> bottoniRimuovi = driver.findElements(By.xpath("//button[contains(text(), 'Rimuovi')]"));
-            for (int i = 0; i < bottoniRimuovi.size(); i++) {
+            // Se ci sono già opere nel carrello, rimuoviamole tutte cliccando in loop.
+            // aspettiamo esplicitamente che il numero di bottoni "Rimuovi"
+            // sia realmente diminuito dopo ogni click, prima di procedere con il successivo.
+            int numeroResidui = driver.findElements(By.xpath("//button[contains(text(), 'Rimuovi')]")).size();
+            for (int i = 0; i < numeroResidui; i++) {
+                int contoPrimaDelClick = driver.findElements(By.xpath("//button[contains(text(), 'Rimuovi')]")).size();
                 wait.until(ExpectedConditions.elementToBeClickable(By.xpath("(//button[contains(text(), 'Rimuovi')])[1]"))).click();
-                // Breve pausa per permettere al fetch di Node.js di aggiornare il DOM
-                try { Thread.sleep(300); } catch (Exception e) {}
+                wait.until(d -> d.findElements(By.xpath("//button[contains(text(), 'Rimuovi')]")).size() < contoPrimaDelClick);
             }
 
             // Torniamo al catalogo per iniziare il test vero e proprio
@@ -437,6 +486,16 @@ public class ClienteFSMTest {
             // 4. Verifica Svuotamento Post-Acquisto
             Boolean isCartEmpty = wait.until(ExpectedConditions.invisibilityOfElementLocated(By.id("btn-acquista")));
             assertTrue(isCartEmpty, "Il carrello doveva risultare vuoto dopo la conferma dell'acquisto.");
+            
+                        // Verifica di persistenza: deve esistere un ordine reale nel DB (non solo
+            // un carrello svuotato in UI), e il carrello dell'utente su MongoDB deve
+            // essere effettivamente a zero elementi.
+            Document ultimoOrdine = trovaUltimoOrdineNelDB(USER_TEST);
+            assertNotNull(ultimoOrdine, "L'acquisto doveva aver scritto un ordine reale nel DB, non solo svuotato il carrello in UI.");
+ 
+            long carrelloResiduo = contaCarrelloNelDB(USER_TEST);
+            assertEquals(0, carrelloResiduo, "Il carrello dell'utente nel DB doveva essere vuoto dopo l'acquisto, non solo nell'interfaccia.");
+           
             System.out.println("[TEST SUPERATO] Flusso di acquisto completato con successo.");
         }
 
@@ -453,6 +512,21 @@ public class ClienteFSMTest {
 
             WebElement authContainer = wait.until(ExpectedConditions.visibilityOfElementLocated(By.id("auth-container")));
             assertTrue(authContainer.isDisplayed(), "Il sistema doveva distruggere la sessione e tornare in S0.");
+        }
+       
+        @Test
+        @DisplayName("Transizione S4 -> S0: Logout Cliente dal Carrello")
+        @Transizione({"S2->S4", "S4->S0"})
+        void testLogoutClienteDalCarrello() {
+            driver.findElement(By.cssSelector("button[data-target='tab-carrello']")).click();
+            wait.until(ExpectedConditions.visibilityOfElementLocated(By.id("tab-carrello")));
+ 
+            WebElement logoutButton = wait.until(ExpectedConditions.elementToBeClickable(By.id("btn-logout")));
+            logoutButton.click();
+ 
+            WebElement authContainer = wait.until(ExpectedConditions.visibilityOfElementLocated(By.id("auth-container")));
+            assertTrue(authContainer.isDisplayed(), "Il sistema doveva distruggere la sessione e tornare in S0 anche partendo dal carrello.");
+            System.out.println(" [TEST SUPERATO] Logout dal carrello confermato: transizione S4 -> S0.");
         }
     }
 }
