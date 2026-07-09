@@ -412,5 +412,37 @@
     ],
     "_id": "6a4fba6fa0854a9e1576abf8",
     "__v": 0
+  },
+  {
+    "id": 55377,
+    "utente": "PROVA UTENTE",
+    "data": "2026-07-09",
+    "prezzo": 150,
+    "prodottiAcquistati": [
+      {
+        "codice": "DEL-1783352513844",
+        "prezzo": "150",
+        "quantita": 1,
+        "_id": "6a4fc05bf49871aa9e5a77f1"
+      }
+    ],
+    "_id": "6a4fc05bf49871aa9e5a77f0",
+    "__v": 0
+  },
+  {
+    "id": 15784,
+    "utente": "PROVA UTENTE",
+    "data": "2026-07-09",
+    "prezzo": 150,
+    "prodottiAcquistati": [
+      {
+        "codice": "DEL-1783352800892",
+        "prezzo": "150",
+        "quantita": 1,
+        "_id": "6a4fc64202d51ea4c9980a3a"
+      }
+    ],
+    "_id": "6a4fc64202d51ea4c9980a39",
+    "__v": 0
   }
 ]

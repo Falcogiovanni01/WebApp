@@ -1,31 +1,5 @@
 [
   {
-    "codice": "DEL-1783352513844",
-    "nome": "Opera da Rimuovere",
-    "descrizione": "",
-    "prezzo": "150",
-    "immagine1": [],
-    "immagine2": [],
-    "immagine3": [],
-    "immagine4": [],
-    "tecnica": "",
-    "_id": "6a4bccc24743e31c7bac301d",
-    "__v": 0
-  },
-  {
-    "codice": "DEL-1783352800892",
-    "nome": "Opera da Rimuovere",
-    "descrizione": "",
-    "prezzo": "150",
-    "immagine1": [],
-    "immagine2": [],
-    "immagine3": [],
-    "immagine4": [],
-    "tecnica": "",
-    "_id": "6a4bcde14743e31c7bac301f",
-    "__v": 0
-  },
-  {
     "codice": "TEST-1783441946359",
     "nome": "Opera Autogenerata",
     "descrizione": "Opera creata da Selenium per test automatizzato",
@@ -197,6 +171,33 @@
     "prezzo": "9999",
     "tecnica": "",
     "_id": "6a4fb3cecd8abda8c49a61ef",
+    "__v": 0
+  },
+  {
+    "codice": "TEST-1783613693641",
+    "nome": "Opera Autogenerata",
+    "descrizione": "Opera creata da Selenium per test automatizzato",
+    "prezzo": "150",
+    "tecnica": "Automazione",
+    "_id": "6a4fc8fde3363ad701520ca9",
+    "__v": 0
+  },
+  {
+    "codice": "MOD-1783613695225",
+    "nome": "Opera da Modificare",
+    "descrizione": "",
+    "prezzo": "150",
+    "tecnica": "",
+    "_id": "6a4fc8ffe3363ad701520cab",
+    "__v": 0
+  },
+  {
+    "codice": "MOD-1783613696561",
+    "nome": "Titolo Modificato!",
+    "descrizione": "",
+    "prezzo": "9999",
+    "tecnica": "",
+    "_id": "6a4fc900e3363ad701520cae",
     "__v": 0
   }
 ]

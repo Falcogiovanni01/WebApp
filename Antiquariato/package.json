@@ -12,7 +12,10 @@
     "mongoose": "^8.0.3"
   },
   "devDependencies": {
+    "@eslint/js": "^10.0.1",
     "chai": "^6.2.2",
+    "eslint": "^10.6.0",
+    "globals": "^17.7.0",
     "mocha": "^11.7.6",
     "nyc": "^18.0.0",
     "selenium-webdriver": "^4.45.0"

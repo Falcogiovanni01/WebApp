@@ -487,7 +487,7 @@ public class ClienteFSMTest {
             Boolean isCartEmpty = wait.until(ExpectedConditions.invisibilityOfElementLocated(By.id("btn-acquista")));
             assertTrue(isCartEmpty, "Il carrello doveva risultare vuoto dopo la conferma dell'acquisto.");
             
-                        // Verifica di persistenza: deve esistere un ordine reale nel DB (non solo
+            // Verifica di persistenza: deve esistere un ordine reale nel DB (non solo
             // un carrello svuotato in UI), e il carrello dell'utente su MongoDB deve
             // essere effettivamente a zero elementi.
             Document ultimoOrdine = trovaUltimoOrdineNelDB(USER_TEST);
@@ -529,4 +529,60 @@ public class ClienteFSMTest {
             System.out.println(" [TEST SUPERATO] Logout dal carrello confermato: transizione S4 -> S0.");
         }
     }
+
+    @Nested
+@DisplayName("Copertura di codice aggiuntiva: percorsi di errore in Registrazione")
+class CoperturaCodice_ErroriRegistrazione {
+
+    @Test
+    @DisplayName("Registrazione con nome utente già esistente (vincolo unique, righe 184-188)")
+    void testRegistrazioneNomeGiaEsistente() throws Exception {
+        HttpClient client = HttpClient.newHttpClient();
+        long timestamp = System.currentTimeMillis();
+        String telefonoNuovo = "3" + String.format("%09d", timestamp % 1_000_000_000L);
+
+        String body = "nome=" + URLEncoder.encode(USER_TEST, StandardCharsets.UTF_8)
+                + "&password=" + URLEncoder.encode("altrapassword123", StandardCharsets.UTF_8)
+                + "&numero=" + URLEncoder.encode(telefonoNuovo, StandardCharsets.UTF_8)
+                + "&carta=" + URLEncoder.encode("1234567890123456", StandardCharsets.UTF_8);
+
+        HttpRequest req = HttpRequest.newBuilder()
+                .uri(URI.create(BASE_URL + "/registrazione"))
+                .header("Content-Type", "application/x-www-form-urlencoded")
+                .POST(HttpRequest.BodyPublishers.ofString(body))
+                .build();
+        HttpResponse<String> res = client.send(req, HttpResponse.BodyHandlers.ofString());
+
+        assertEquals(409, res.statusCode(), "...");
+        assertTrue(res.body().contains("nome utente"), "...");
+    }
+
+@Test
+@DisplayName("Registrazione con numero di telefono non valido (errore di validazione Mongoose, righe 191-194)")
+void testRegistrazioneTelefonoNonValido() throws Exception {
+    HttpClient client = HttpClient.newHttpClient();
+    long timestamp = System.currentTimeMillis();
+    String username = "UtenteTelefonoErrato_" + timestamp;
+
+    // Numero volutamente troppo corto (5 cifre invece di 10): deve far
+    // scattare il validator Mongoose sul campo 'numero', non il vincolo unique.
+    String body = "nome=" + URLEncoder.encode(username, StandardCharsets.UTF_8)
+            + "&password=" + URLEncoder.encode("password123", StandardCharsets.UTF_8)
+            + "&numero=" + URLEncoder.encode("12345", StandardCharsets.UTF_8)
+            + "&carta=" + URLEncoder.encode("1234567890123456", StandardCharsets.UTF_8);
+
+    HttpRequest req = HttpRequest.newBuilder()
+            .uri(URI.create(BASE_URL + "/registrazione"))
+            .header("Content-Type", "application/x-www-form-urlencoded")
+            .POST(HttpRequest.BodyPublishers.ofString(body))
+            .build();
+    HttpResponse<String> res = client.send(req, HttpResponse.BodyHandlers.ofString());
+
+    assertEquals(400, res.statusCode(), "Il server doveva rifiutare un numero di telefono malformato con status 400.");
+    assertTrue(res.body().contains("10 cifre"), "Il messaggio di errore doveva indicare il vincolo sulle 10 cifre.");
+    System.out.println("[TEST SUPERATO] Registrazione con numero di telefono non valido correttamente rifiutata (400).");
+}
+}
+
+
 }

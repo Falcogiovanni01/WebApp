@@ -16,8 +16,9 @@ del perché sono state fatte così.
 3. [Prerequisiti](#prerequisiti)
 4. [Come avviare il progetto in locale](#come-avviare-il-progetto-in-locale)
 5. [Come eseguire i test automatizzati](#come-eseguire-i-test-automatizzati)
-6. [Semplificazioni consapevoli](#semplificazioni-consapevoli)
-7. [Risoluzione problemi comuni](#risoluzione-problemi-comuni)
+6. [Analisi aggiuntive (facoltative)](#analisi-aggiuntive-facoltative)
+7. [Semplificazioni consapevoli](#semplificazioni-consapevoli)
+8. [Risoluzione problemi comuni](#risoluzione-problemi-comuni)
 
 ---
 
@@ -57,11 +58,25 @@ proprio la transizione Catalogo ↔ Carrello), e ogni `@DisplayName` riporta il 
 transizione testata. Il risultato è che l'output di `mvn test` si legge quasi come un resoconto
 diretto dell'automa, non come un elenco anonimo di asserzioni.
 
+La copertura delle transizioni non è affidata alla sola lettura del codice: un'estensione JUnit 5
+dedicata (`CoperturaFSMExtension`, pacchetto `it.unina.fsm`) accumula automaticamente, a runtime,
+quali transizioni sono state esercitate con successo, e stampa a fine suite un report percentuale
+confrontato con la lista di transizioni attese ricostruita dai diagrammi originali
+(`CLIENT.svg`, `GESTORE.svg`).
+
 Sull'approccio di test, la scelta è stata deliberatamente quella dell'integration testing end-to-end,
 con un browser reale che interagisce con l'applicazione reale, invece di test unitari con oggetti
 mock. Il motivo è semplice: un mock può mentire, un browser vero no. Testare contro il sistema
 reale elimina il rischio di falsi positivi — test che passano su un doppio finto dell'applicazione
 ma fallirebbero appena toccano il sistema vero.
+
+Per lo stesso principio, alcuni dei test che verificano operazioni di scrittura (registrazione,
+modifica e rimozione di un'opera, acquisto) non si fermano al controllo dell'interfaccia: aprono
+una connessione diretta a MongoDB (driver `mongodb-driver-sync`, indipendente da quella usata dal
+server Express) per verificare che il dato sia stato realmente persistito, non solo che
+l'interfaccia abbia mostrato un messaggio di successo. Un test che controlla solo l'interfaccia non
+si accorgerebbe di un'operazione che sembra riuscita ma fallisce silenziosamente sul server; questa
+verifica aggiuntiva rafforza l'oracolo del test senza cambiare cosa viene esercitato.
 
 ### 4. Gestione della sessione: solo cookie, verificato lato server
 
@@ -81,6 +96,13 @@ I due ruoli vivono in due processi Express separati — `ServerGestore.js` sulla
 separazione rispecchia una separazione di privilegi che ha senso anche nel mondo reale: chi gestisce
 la galleria non deve condividere le stesse API né lo stesso spazio di sessione di chi acquista.
 Tenere i due processi su porte diverse evita anche conflitti tra i cookie di sessione dei due ruoli.
+
+Coerentemente con questa separazione, le credenziali del Gestore (`admin`/`admin`) sono una
+costante scritta nel codice sorgente di `ServerGestore.js`, non un documento persistito su
+database: non essendoci uno stato da preparare, non serve alcun provisioning automatico per questo
+ruolo. Per il Cliente, dove le credenziali sono invece un documento reale in MongoDB, la suite di
+test le crea da sola al primo avvio se non le trova già nel database (si veda la sezione
+[Come eseguire i test automatizzati](#come-eseguire-i-test-automatizzati)).
 
 ---
 
@@ -105,7 +127,13 @@ WebApp/
             ├── pom.xml
             └── src/test/java/it/unina/
                 ├── ClienteFSMTest.java
-                └── GestoreFSMTest.java
+                ├── GestoreFSMTest.java
+                └── fsm/
+                    ├── Transizione.java
+                    ├── Fsm.java
+                    ├── CoperturaFSM.java
+                    ├── TransizioniAttese.java
+                    └── CoperturaFSMExtension.java
 ```
 
 `ServerCliente.js` e `ServerGestore.js` vivono allo stesso livello e attingono entrambi dallo
@@ -116,8 +144,12 @@ solo `npm install` copre entrambi.
 
 ## Prerequisiti
 
-**Node.js**: va bene una versione LTS recente, 18.x o 20.x. Il progetto usa Express e Mongoose in
-modo standard, senza dipendenze che richiedano versioni specifiche o funzionalità sperimentali.
+**Node.js**: va bene una versione LTS recente, 18.x o 20.x, per avviare ed eseguire l'applicazione
+e i due server. Il progetto usa Express e Mongoose in modo standard, senza dipendenze che
+richiedano versioni specifiche o funzionalità sperimentali. *(Questo requisito riguarda solo
+l'esecuzione dei server e dei test; se si desidera rieseguire anche l'analisi di code coverage
+facoltativa descritta più sotto, quello strumento ha un vincolo di versione più stringente, spiegato
+nella sezione dedicata.)*
 
 **Java (JDK)**: 11 come requisito minimo garantito — è la versione su cui il progetto è stato
 sviluppato e testato (l'ambiente di riferimento gira su Java 11.0.30). Versioni successive, come
@@ -125,7 +157,12 @@ sviluppato e testato (l'ambiente di riferimento gira su Java 11.0.30). Versioni 
 esattamente come previsto, 11 è la scelta più sicura.
 
 **Maven**: si assume installato globalmente, con `mvn` disponibile nel `PATH` di sistema. Il
-progetto non include un Maven Wrapper (`mvnw`).
+progetto non include un Maven Wrapper (`mvnw`). Il `pom.xml` include tra le dipendenze
+`mongodb-driver-sync` (usata da alcuni test per verificare la persistenza dei dati direttamente su
+MongoDB, si veda il punto 3 dell'architettura): **la prima esecuzione di `mvn test` richiede una
+connessione a Internet attiva**, necessaria a Maven per scaricare questa dipendenza (e le altre) da
+Maven Central. Le esecuzioni successive useranno la cache locale (`~/.m2`) e non necessitano più di
+connettività.
 
 **MongoDB**: un'installazione locale classica, con `mongod` in ascolto come servizio in background
 sulla porta di default (`mongodb://127.0.0.1:27017`). Non serve Docker, e non c'è una versione
@@ -204,7 +241,57 @@ inserisci 2-3 opere, e solo dopo lancia i test del Cliente, che le troveranno pr
 I test durante l'esecuzione aprono una finestra vera di Google Chrome pilotata da Selenium: meglio
 non chiuderla né interagirci manualmente mentre la suite gira. E se vuoi seguire cosa sta
 verificando ogni singolo test man mano che scorre l'output, i `@DisplayName` sono scritti apposta
-per essere leggibili come un resoconto delle transizioni della FSM, non come un elenco tecnico.
+per essere leggibili come un resoconto delle transizioni della FSM, non come un elenco tecnico. A
+fine esecuzione, in coda all'output, compare anche il report di copertura delle transizioni
+generato da `CoperturaFSMExtension`, con la percentuale di archi della FSM effettivamente
+esercitati da test superati.
+
+---
+
+## Analisi aggiuntive (facoltative)
+
+Oltre alla suite Selenium/JUnit, il progetto è stato affiancato da alcuni strumenti di analisi
+indipendenti, usati per la stesura della relazione. **Nessuno di questi è necessario per eseguire
+o verificare il funzionamento dell'applicazione**: sono documentati qui solo per chi desiderasse
+riprodurli.
+
+### Code coverage lato server (nyc / Istanbul)
+
+Misura quali righe e rami del codice di `ServerCliente.js`/`ServerGestore.js` vengono
+effettivamente eseguiti mentre la suite Selenium gira. Richiede un'installazione locale
+(`npm install --save-dev nyc`, dalla cartella `Antiquariato/`) e, soprattutto, **una versione LTS
+di Node (consigliata la 20.x)**: versioni molto recenti di Node (osservata la 26.x) non sono
+risultate compatibili con questo strumento nell'ambiente di sviluppo del progetto. Questo vincolo
+riguarda unicamente `nyc`, non l'esecuzione ordinaria dei server descritta nelle sezioni precedenti.
+
+```bash
+cd Antiquariato
+npx nyc node ServerCliente.js      # avviare il server sotto osservazione
+# in un altro terminale: mvn test -Dtest=ClienteFSMTest
+# tornare al terminale del server e premere Ctrl+C per generare il report
+open coverage/index.html           # macOS; xdg-open su Linux, start su Windows
+```
+
+### Analisi statica del codice server (ESLint)
+
+```bash
+cd Antiquariato
+npx eslint ServerCliente.js ServerGestore.js --format stylish
+```
+
+Richiede il file di configurazione `eslint.config.mjs` presente nella cartella, con
+`languageOptions.globals` impostato su `globals.node` (non `globals.browser`), necessario perché
+ESLint riconosca correttamente variabili globali di Node come `__dirname`.
+
+### Analisi statica del markup client (htmlhint)
+
+```bash
+npx htmlhint Client/Cliente.html
+npx htmlhint Gestore/Gestore.html
+```
+
+Nessuna installazione o configurazione preventiva necessaria: `npx` scarica lo strumento al volo
+alla prima esecuzione.
 
 ---
 
@@ -226,6 +313,10 @@ una svista scoperta da qualcun altro:
 - **Non esiste uno script di seeding automatico** che ripopoli il catalogo da un file JSON verso
   MongoDB: il catalogo si costruisce interamente tramite il pannello Gestore, che scrive
   contestualmente su MongoDB e su `Opere.json`.
+- **La copertura di codice (nyc) non raggiunge il 100% dei rami**, per scelta: i rami non coperti
+  residui riguardano quasi esclusivamente la gestione difensiva di fallimenti infrastrutturali (es.
+  disconnessione del database), la cui verifica richiederebbe tecniche di mocking estranee
+  all'approccio end-to-end scelto per questo progetto.
 
 ---
 
@@ -248,3 +339,14 @@ occupate), e che MongoDB sia effettivamente raggiungibile su `127.0.0.1:27017`.
 **I test del carrello falliscono senza un motivo apparente**
 Controlla di aver popolato il catalogo con almeno un'opera dal pannello Gestore prima di lanciare i
 test del Cliente — è il caso più comune, non un difetto del codice.
+
+**`mvn test` restituisce un errore di dipendenza non trovata al primo avvio**
+Verifica la connessione a Internet: il `pom.xml` include `mongodb-driver-sync`, scaricata da Maven
+Central al primo build. Le esecuzioni successive non richiedono più connettività, grazie alla cache
+locale di Maven.
+
+**`npx nyc node ServerCliente.js` produce un report vuoto o senza righe strumentate**
+Quasi certamente un problema di versione di Node troppo recente (osservato con la 26.x). Passa a
+una versione LTS (18.x o 20.x), ad esempio con `nvm use 20`, e ripeti il comando. Questo problema
+riguarda solo l'analisi di code coverage facoltativa, non l'esecuzione ordinaria dei server o della
+suite di test.
