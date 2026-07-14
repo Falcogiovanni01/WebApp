@@ -1,0 +1,13 @@
+{
+  "$schema": "./node_modules/@stryker-mutator/core/schema/stryker-schema.json",
+  "testRunner": "command",
+  "commandRunner": {
+    "command": "bash run-mutation-tests.sh"
+  },
+  "coverageAnalysis": "off",
+  "mutate": [
+    "serverClient.js"
+  ],
+  "reporters": ["clear-text", "progress", "html"],
+  "timeoutMS": 60000
+}
