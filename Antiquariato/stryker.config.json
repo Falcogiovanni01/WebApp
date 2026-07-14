@@ -5,9 +5,7 @@
     "command": "bash run-mutation-tests.sh"
   },
   "coverageAnalysis": "off",
-  "mutate": [
-    "serverClient.js"
-  ],
+  "mutate": ["ServerCliente.js"],
   "reporters": ["clear-text", "progress", "html"],
   "timeoutMS": 60000
 }
