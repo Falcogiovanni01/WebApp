@@ -1,7 +1,7 @@
 #!/bin/bash
 set -e
 
-node serverClient.js &
+node serverCliente.js &
 SERVER_PID=$!
 
 npx wait-on http://localhost:3001 -t 15000
