@@ -16,9 +16,11 @@ del perché sono state fatte così.
 3. [Prerequisiti](#prerequisiti)
 4. [Come avviare il progetto in locale](#come-avviare-il-progetto-in-locale)
 5. [Come eseguire i test automatizzati](#come-eseguire-i-test-automatizzati)
-6. [Analisi aggiuntive (facoltative)](#analisi-aggiuntive-facoltative)
-7. [Semplificazioni consapevoli](#semplificazioni-consapevoli)
-8. [Risoluzione problemi comuni](#risoluzione-problemi-comuni)
+6. [Mutation analysis (Stryker)](#mutation-analysis-stryker)
+7. [Mutation testing: nota metodologica](#mutation-testing-nota-metodologica)
+8. [Analisi aggiuntive (facoltative)](#analisi-aggiuntive-facoltative)
+9. [Semplificazioni consapevoli](#semplificazioni-consapevoli)
+10. [Risoluzione problemi comuni](#risoluzione-problemi-comuni)
 
 ---
 
@@ -113,8 +115,11 @@ WebApp/
 └── Antiquariato/
     ├── ServerCliente.js
     ├── ServerGestore.js
-    ├── package.json          # unico, condiviso da entrambi i server
-    ├── node_modules/         # unico, condiviso
+    ├── package.json              # unico, condiviso da entrambi i server
+    ├── node_modules/             # unico, condiviso
+    ├── stryker.config.json       # configurazione mutation analysis (vedi sezione dedicata)
+    ├── run-mutation-tests.sh     # script di supporto per Stryker
+    ├── reports/mutation/         # output generato da Stryker (HTML + riepilogo testuale)
     ├── Client/
     │   ├── Cliente.html
     │   ├── app.js
@@ -151,18 +156,28 @@ l'esecuzione dei server e dei test; se si desidera rieseguire anche l'analisi di
 facoltativa descritta più sotto, quello strumento ha un vincolo di versione più stringente, spiegato
 nella sezione dedicata.)*
 
-**Java (JDK)**: 11 come requisito minimo garantito — è la versione su cui il progetto è stato
-sviluppato e testato (l'ambiente di riferimento gira su Java 11.0.30). Versioni successive, come
-17 o 21, sono supportate retroattivamente senza problemi, ma se vuoi essere certo che tutto giri
-esattamente come previsto, 11 è la scelta più sicura.
+**Java (JDK)**: 11 come requisito minimo garantito nel `pom.xml` (`maven.compiler.source/target`),
+ed è la versione su cui il progetto è stato sviluppato inizialmente. È stato verificato che anche
+versioni molto più recenti (JDK 26) compilano ed eseguono correttamente la suite senza errori,
+producendo solo un warning innocuo del compilatore (*"location of system modules is not set in
+conjunction with -source 11"*) che suggerisce di usare `--release` al posto di `-source`/`-target`
+— non blocca in alcun modo la build. Qualunque JDK 11+ installato va quindi bene.
 
 **Maven**: si assume installato globalmente, con `mvn` disponibile nel `PATH` di sistema. Il
-progetto non include un Maven Wrapper (`mvnw`). Il `pom.xml` include tra le dipendenze
-`mongodb-driver-sync` (usata da alcuni test per verificare la persistenza dei dati direttamente su
-MongoDB, si veda il punto 3 dell'architettura): **la prima esecuzione di `mvn test` richiede una
-connessione a Internet attiva**, necessaria a Maven per scaricare questa dipendenza (e le altre) da
-Maven Central. Le esecuzioni successive useranno la cache locale (`~/.m2`) e non necessitano più di
-connettività.
+progetto non include un Maven Wrapper (`mvnw`): se il progetto è stato finora eseguito solo tramite
+un IDE (Eclipse/IntelliJ), è probabile che Maven non sia ancora installato per l'uso da terminale.
+Su macOS, il modo più rapido è tramite Homebrew:
+
+```bash
+brew install maven
+mvn -version   # verifica installazione e versione del JDK agganciata
+```
+
+Il `pom.xml` include tra le dipendenze `mongodb-driver-sync` (usata da alcuni test per verificare
+la persistenza dei dati direttamente su MongoDB, si veda il punto 3 dell'architettura): **la prima
+esecuzione di `mvn test` richiede una connessione a Internet attiva**, necessaria a Maven per
+scaricare questa dipendenza (e le altre) da Maven Central. Le esecuzioni successive useranno la
+cache locale (`~/.m2`) e non necessitano più di connettività.
 
 **MongoDB**: un'installazione locale classica, con `mongod` in ascolto come servizio in background
 sulla porta di default (`mongodb://127.0.0.1:27017`). Non serve Docker, e non c'è una versione
@@ -216,6 +231,12 @@ inserisci qualcuna dal pannello Gestore — scheda **Aggiungi**, 2-3 opere basta
 catalogo su cui lavorare. Ogni opera aggiunta viene salvata sia su MongoDB sia su `Opere.json`, e
 compare subito nel catalogo lato Cliente.
 
+**Importante**: quando si esegue manualmente uno dei due server per esplorare l'applicazione (o per
+lanciare `mvn test` a mano), assicurarsi di terminarlo (`Ctrl+C`) prima di lanciare la mutation
+analysis descritta più sotto — Stryker avvia da solo un'istanza del server per ogni mutante
+generato, e un'istanza residua sulla stessa porta impedirebbe l'avvio di quella mutata,
+invalidando silenziosamente i risultati.
+
 ---
 
 ## Come eseguire i test automatizzati
@@ -246,14 +267,149 @@ fine esecuzione, in coda all'output, compare anche il report di copertura delle 
 generato da `CoperturaFSMExtension`, con la percentuale di archi della FSM effettivamente
 esercitati da test superati.
 
+Per eseguire solo un sottoinsieme mirato (ad esempio, per limitarsi ai test di autenticazione e
+registrazione del Cliente, incluso l'uso durante la mutation analysis descritta di seguito), si può
+restringere l'esecuzione alle singole classi `@Nested`:
+
+```bash
+mvn test -Dtest=ClienteFSMTest\$S0_S3_AccessoPubblico,ClienteFSMTest\$S3_Registrazione
+```
+
+---
+
+## Mutation analysis (Stryker)
+
+Oltre alla copertura delle transizioni FSM, il progetto include una **mutation analysis** del
+backend Cliente: si verifica non solo che ogni transizione venga esercitata da un test, ma che i
+test esistenti sappiano davvero accorgersi di un difetto introdotto nel codice applicativo — lo
+stesso principio descritto a lezione per PIT/Pitclipse, applicato però a un tool equivalente per
+l'ecosistema JavaScript, dato che l'applicazione è Node.js/Express e non Java.
+
+### Perché Stryker e non PIT
+
+PIT/Pitclipse (visti a lezione) mutano bytecode Java: non hanno nulla su cui operare in questo
+progetto, perché l'unico codice Java presente è il livello di test (Selenium/JUnit), non
+l'applicazione sotto test. Lo strumento equivalente per Node.js è **StrykerJS**
+(`@stryker-mutator/core`), usato qui in modalità **command runner**: Stryker muta il file
+applicativo indicato, poi delega la verifica a un comando esterno a sua scelta — nel nostro caso,
+uno script che avvia il server mutato e lancia contro di esso la suite Selenium/JUnit reale,
+usandola come oracolo.
+
+### Scope scelto
+
+Per restare coerenti con l'indicazione di concentrarsi sul lato Cliente e di non eccedere nello
+scope del progetto, la mutation analysis è stata limitata a:
+
+- **file mutato**: `ServerCliente.js` (l'intero file, non l'intero backend incluso il lato Gestore);
+- **test usati come oracolo**: solo le classi `@Nested` `S0_S3_AccessoPubblico` e
+  `S3_Registrazione` di `ClienteFSMTest` (autenticazione e registrazione), non l'intera suite —
+  che includerebbe anche l'area privata, carrello e ordini, aumentando enormemente i tempi di
+  esecuzione senza un beneficio proporzionale per questa dimostrazione.
+
+Il motivo di questa scelta è anche pratico: con il command runner, Stryker non ha visibilità su
+quali test coprano quale mutante (`coverageAnalysis: "off"` è obbligatorio in questa modalità),
+quindi **l'intera suite selezionata viene rieseguita per ogni singolo mutante generato** — avvio
+server, avvio browser, esecuzione Selenium compresi. Anche solo con un file e due gruppi di test,
+l'esecuzione completa richiede alcuni minuti.
+
+### File di supporto
+
+- **`stryker.config.json`**: configura il testRunner `command`, il file da mutare
+  (`ServerCliente.js`), la disattivazione della coverage analysis e i reporter (`html`,
+  `clear-text`, `progress`).
+- **`run-mutation-tests.sh`**: avvia `ServerCliente.js` in background, attende che risponda
+  (`wait-on`), esegue `mvn test` limitato alle due classi `@Nested` sopra indicate dentro
+  `Testing/antiquariato_test`, e termina il server al termine, propagando l'exit code di Maven a
+  Stryker.
+
+### Come riprodurla
+
+Prerequisiti aggiuntivi rispetto alla suite Selenium ordinaria:
+
+```bash
+cd Antiquariato
+npm install --save-dev @stryker-mutator/core wait-on
+chmod +x run-mutation-tests.sh
+```
+
+`ServerCliente.js` (e l'intero contenuto di `Testing/antiquariato_test/`) devono essere **tracciati
+da git** (`git ls-files | grep ServerCliente` deve restituire il file): Stryker copia il progetto
+in una sandbox isolata per ogni mutante basandosi esclusivamente sui file tracciati, non su tutta
+la cartella fisica.
+
+Con MongoDB già in esecuzione e **nessuna istanza manuale di `ServerCliente.js` attiva sulla porta
+3001** (verificabile con `lsof -i :3001`), si lancia dalla root `Antiquariato/`:
+
+```bash
+npx stryker run
+```
+
+Il riepilogo testuale compare a schermo a fine esecuzione; il report dettagliato, file per file e
+mutante per mutante, viene generato in `reports/mutation/mutation.html`.
+
+### Risultato ottenuto
+
+Sul file `ServerCliente.js`, Stryker ha generato **307 mutanti**, di cui **302 uccisi e 5
+sopravvissuti** (mutation score 98.37%). I 5 sopravvissuti, tutti riconducibili a due categorie:
+
+1. **Assertion troppo generiche nei test negativi**: `testRegistrazioneCampiVuoti` verifica solo
+   che il form resti visibile a fronte di un invio vuoto, senza isolare quale singolo campo
+   provoca il blocco — due mutanti che disattivano `required` rispettivamente su `nome` e su
+   `carta` sopravvivono, perché il test rileva comunque un form bloccato (per via degli altri campi
+   ancora obbligatori), mascherando il fatto che quello specifico vincolo non viene più verificato
+   in isolamento.
+2. **Assenza di verifica sul contenuto della risposta di errore**: un mutante che svuota il corpo
+   JSON della risposta 401 di sessione non valida sopravvive, perché nessun test asserisce il
+   contenuto del messaggio d'errore, solo il comportamento a livello di interfaccia.
+3. **Nessun input malformato testato per il numero di telefono**: un mutante che disattiva la
+   regex di validazione del numero (sostituendola con un validatore che accetta sempre) sopravvive,
+   perché nessun test invia un numero di telefono in un formato esplicitamente non valido.
+
+Questi sopravvissuti non indicano un difetto applicativo, ma un limite di granularità della suite:
+la copertura delle transizioni FSM (100% sul lato Cliente) garantisce che ogni stato venga
+raggiunto, ma non garantisce che ogni singola regola di validazione dietro quello stato venga
+verificata in isolamento — è esattamente il tipo di gap che la mutation analysis è pensata per far
+emergere, e che una copertura di codice o di transizioni, da sola, non avrebbe mostrato.
+
+---
+
+## Mutation testing: nota metodologica
+
+Il materiale del corso distingue esplicitamente due tecniche distinte, spesso confuse per il nome
+simile:
+
+- **mutation analysis**: si muta il codice applicativo, per verificare se i test *esistenti* se ne
+  accorgono (quanto descritto sopra con Stryker);
+- **mutation testing**: si muta il codice sorgente dei test *stessi* (aggiungendo, rimuovendo o
+  scambiando righe, o incrociando i valori tra due test case), per generare nuovi test case.
+
+A differenza della mutation analysis — per cui esistono tool maturi e diffusi sia in ambito Java
+(PIT) sia JavaScript (Stryker) — non è stato individuato alcuno strumento equivalente, pronto
+all'uso, che muti automaticamente il codice sorgente di test JUnit esistenti secondo gli operatori
+descritti a lezione. Gli strumenti più vicini per nome (EvoSuite) risolvono in realtà un problema
+diverso: generano test interamente nuovi analizzando il codice applicativo tramite algoritmo
+genetico, senza prendere in input né mutare i test già scritti — e in ogni caso richiederebbero
+codice applicativo Java, non compatibile con il backend Node.js di questo progetto.
+
+Per questo motivo, il mutation testing in senso stretto è stato esplorato in questo progetto solo
+a livello dimostrativo e manuale su un singolo test case (`testRegistrazioneSuccesso`), applicando
+a mano tre degli operatori descritti a lezione (rimozione di una riga, scambio di due righe,
+aggiunta di una riga) e un tentativo di crossover con `testLoginSuccesso`. La dimostrazione ha
+confermato in pratica le criticità della tecnica già discusse a lezione: alcuni mutanti generano
+test inapplicabili (rimozione del campo obbligatorio "numero di telefono", che rende la
+registrazione fallimentare per un motivo indipendente dal test stesso), altri sono equivalenti
+(scambio di due `sendKeys` indipendenti, senza alcun effetto osservabile), e il crossover, applicato
+a due test brevi che condividono solo lo stato iniziale, degenera semplicemente negli stessi test
+di partenza.
+
 ---
 
 ## Analisi aggiuntive (facoltative)
 
-Oltre alla suite Selenium/JUnit, il progetto è stato affiancato da alcuni strumenti di analisi
-indipendenti, usati per la stesura della relazione. **Nessuno di questi è necessario per eseguire
-o verificare il funzionamento dell'applicazione**: sono documentati qui solo per chi desiderasse
-riprodurli.
+Oltre alla suite Selenium/JUnit e alla mutation analysis descritta sopra, il progetto è stato
+affiancato da alcuni strumenti di analisi indipendenti, usati per la stesura della relazione.
+**Nessuno di questi è necessario per eseguire o verificare il funzionamento dell'applicazione**:
+sono documentati qui solo per chi desiderasse riprodurli.
 
 ### Code coverage lato server (nyc / Istanbul)
 
@@ -262,7 +418,8 @@ effettivamente eseguiti mentre la suite Selenium gira. Richiede un'installazione
 (`npm install --save-dev nyc`, dalla cartella `Antiquariato/`) e, soprattutto, **una versione LTS
 di Node (consigliata la 20.x)**: versioni molto recenti di Node (osservata la 26.x) non sono
 risultate compatibili con questo strumento nell'ambiente di sviluppo del progetto. Questo vincolo
-riguarda unicamente `nyc`, non l'esecuzione ordinaria dei server descritta nelle sezioni precedenti.
+riguarda unicamente `nyc`, non l'esecuzione ordinaria dei server né la mutation analysis con
+Stryker, entrambe verificate funzionanti anche su Node 20.x/versioni più recenti.
 
 ```bash
 cd Antiquariato
@@ -317,6 +474,14 @@ una svista scoperta da qualcun altro:
   residui riguardano quasi esclusivamente la gestione difensiva di fallimenti infrastrutturali (es.
   disconnessione del database), la cui verifica richiederebbe tecniche di mocking estranee
   all'approccio end-to-end scelto per questo progetto.
+- **La mutation analysis è limitata al lato Cliente e a un solo file** (`ServerCliente.js`),
+  verificato da un sottoinsieme mirato della suite (autenticazione e registrazione): un'estensione
+  all'intero backend, o al lato Gestore, avrebbe moltiplicato i tempi di esecuzione (il command
+  runner rilancia l'intera suite selezionata per ogni mutante) senza un beneficio dimostrativo
+  proporzionale per lo scope di questo progetto.
+- **Il mutation testing (mutazione del codice dei test) è stato dimostrato solo manualmente**, su
+  un singolo test case, per l'assenza di tooling automatizzato maturo per questa tecnica specifica
+  (si veda la sezione dedicata sopra).
 
 ---
 
@@ -345,8 +510,22 @@ Verifica la connessione a Internet: il `pom.xml` include `mongodb-driver-sync`, 
 Central al primo build. Le esecuzioni successive non richiedono più connettività, grazie alla cache
 locale di Maven.
 
+**`mvn: command not found`**
+Maven non è installato a livello di sistema (probabile se il progetto è stato finora eseguito solo
+tramite IDE). Su macOS: `brew install maven`, poi verifica con `mvn -version`.
+
+**`npx stryker run` fallisce con `Cannot find module '.../sandbox-xxx/ServerCliente.js'`**
+Il file non è tracciato da git: Stryker costruisce la sandbox solo a partire dai file tracciati.
+Verifica con `git ls-files | grep ServerCliente` e, se non compare, aggiungilo con `git add`.
+
+**`npx stryker run` fallisce con `EADDRINUSE: address already in use :::3001`**
+C'è un'istanza di `ServerCliente.js` già in ascolto sulla porta 3001, avviata manualmente e non
+terminata. Trovala con `lsof -i :3001` e terminala (`kill -9 <PID>`) prima di rilanciare Stryker:
+lo script si occupa da solo di avviare e fermare il server per ogni mutante, non va tenuto attivo
+manualmente in parallelo.
+
 **`npx nyc node ServerCliente.js` produce un report vuoto o senza righe strumentate**
 Quasi certamente un problema di versione di Node troppo recente (osservato con la 26.x). Passa a
 una versione LTS (18.x o 20.x), ad esempio con `nvm use 20`, e ripeti il comando. Questo problema
-riguarda solo l'analisi di code coverage facoltativa, non l'esecuzione ordinaria dei server o della
-suite di test.
+riguarda solo l'analisi di code coverage facoltativa, non l'esecuzione ordinaria dei server, della
+suite di test, o della mutation analysis con Stryker.

@@ -11,7 +11,7 @@ document.addEventListener('DOMContentLoaded', async () => {
     const formLogin = document.getElementById('form-login');
     const formRegister = document.getElementById('form-register');
 
-    // --- S0: VERIFICA SESSIONE (FIX #1: unica fonte di verità = cookie lato server) ---
+    // --- S0: VERIFICA SESSIONE ( cookie lato server) ---
     async function checkAuthState() {
         try {
             const response = await fetch('/checkSessionCliente');
@@ -82,7 +82,6 @@ document.addEventListener('DOMContentLoaded', async () => {
                 body: new URLSearchParams(data).toString()
             });
             if (response.ok) {
-                // FIX #1: non salviamo più nome/password in localStorage.
                 // L'unica prova di identità è il cookie httpOnly impostato dal server;
                 // checkAuthState() lo interroga direttamente per sapere chi è loggato.
                 checkAuthState();

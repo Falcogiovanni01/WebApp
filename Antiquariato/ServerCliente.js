@@ -117,6 +117,19 @@ const OffertaSchema = new mongoose.Schema({
 });
 const Offerta = mongoose.model('Offerta', OffertaSchema);
 
+const gestoreConnection = mongoose.createConnection('mongodb://127.0.0.1:27017/Gestore');
+const OperaSchema = new mongoose.Schema({
+  codice: String,
+  nome: String,
+  descrizione: String,
+  prezzo: String,
+  tecnica: String,
+  dimensione: String,
+  peso: String,
+  altezza: String
+});
+const Opera = gestoreConnection.model('Opera', OperaSchema);
+
 // File Paths Relativi
 const opereFilePath = path.join(__dirname, 'Opere.json');
 const ordiniFilePath = path.join(__dirname, 'Ordini.json');
@@ -160,11 +173,7 @@ function safeAppendToJsonFile(filePath, newItem) {
 // REGISTRAZIONE
 app.post('/registrazione', async (req, res) => {
   try {
-    // FIX #4: la password non viene più salvata in chiaro. bcryptjs è puro JS
-    // (nessuna compilazione nativa richiesta), scelto apposta per restare
-    // facilmente replicabile su qualunque macchina senza toolchain C++.
     const passwordHash = await bcrypt.hash(req.body.password, SALT_ROUNDS);
-
     const newCliente = new Cliente({
       nome: req.body.nome,
       password: passwordHash,
@@ -174,7 +183,7 @@ app.post('/registrazione', async (req, res) => {
     await newCliente.save();
     console.log('Utente aggiunto nel DB');
 
-    // Non ripetiamo più la password (nemmeno l'hash) nella risposta al client.
+    
     const riepilogo = `UTENTE REGISTRATO nome:${newCliente.nome} numero:${newCliente.numero} carta:${newCliente.carta}`;
     res.json({ riepilogo });
   } catch (err) {
@@ -204,11 +213,8 @@ app.post('/registrazione', async (req, res) => {
 app.post('/login', async (req, res) => {
   const { nome, password } = req.body;
   try {
-    // FIX #4: non possiamo più cercare {nome, password} in un colpo solo,
-    // perché la password è ora un hash: cerchiamo prima l'utente per nome,
+    // La password ha un hash: cerchiamo prima l'utente per nome,
     // poi confrontiamo la password in chiaro ricevuta con l'hash salvato.
-    // (LoginCliente è stata rimossa: Cliente è ora l'unica fonte di verità
-    // per le credenziali, niente più rischio di disallineamento tra due tabelle.)
     const result = await Cliente.findOne({ nome });
     const credenzialiValide = result && await bcrypt.compare(password, result.password);
 
@@ -260,7 +266,6 @@ app.get('/visualizza', (req, res) => {
   });
 });
 
-// AGGIUNGI OPERA AL CARRELLO
 // AGGIUNGI OPERA AL CARRELLO
 app.post('/aggiungiCarrello', requireClienteAuth, async (req, res) => {
   try {
@@ -336,12 +341,13 @@ app.post('/acquista', requireClienteAuth, async (req, res) => {
     // Svuota il carrello dell'utente dopo l'acquisto
     await Carrello.deleteMany({ nome: nomeUtente });
 
+    // Estrai tutti i codici dei prodotti acquistati
+    const codiciAcquistati = validi.map(p => p.codice);
+    
     // --- NUOVA LOGICA: RIMOZIONE DAL CATALOGO ---
     if (fs.existsSync(opereFilePath)) {
         let catalogo = JSON.parse(fs.readFileSync(opereFilePath, 'utf-8') || '[]');
         
-        // Estrai tutti i codici dei prodotti acquistati
-        const codiciAcquistati = validi.map(p => p.codice);
         
         // Filtra il catalogo mantenendo solo le opere NON acquistate
         const catalogoAggiornato = catalogo.filter(opera => !codiciAcquistati.includes(opera.codice));
@@ -349,6 +355,16 @@ app.post('/acquista', requireClienteAuth, async (req, res) => {
         // Riscrivi il catalogo aggiornato
         fs.writeFileSync(opereFilePath, JSON.stringify(catalogoAggiornato, null, 2), 'utf-8');
         console.log(`Opere rimosse dal catalogo: ${codiciAcquistati.join(', ')}`);
+    }
+    // --- RIMOZIONE DAL DATABASE GESTORE (fonte di verità) ---
+    for (const codice of codiciAcquistati) {
+        const operaEsistente = await Opera.findOne({ codice });
+        if (operaEsistente) {
+            await Opera.deleteOne({ codice });
+            console.log(`Opera rimossa dal DB Gestore: ${codice}`);
+        } else {
+            console.log(`Opera con codice ${codice} non trovata nel DB Gestore (già rimossa?)`);
+        }
     }
     // ---------------------------------------------
 

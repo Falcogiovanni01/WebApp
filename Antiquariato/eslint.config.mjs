@@ -13,4 +13,18 @@ export default defineConfig([
     files: ["**/*.js"],
     languageOptions: { sourceType: "commonjs" }
   },
+  {
+    files: ["**/Client/**/*.js"],
+    languageOptions: {
+      globals: globals.browser,
+      sourceType: "script"
+    }
+  },
+  {
+    files: ["**/Gestore/**/*.js"],
+    languageOptions: {
+      globals: globals.browser,
+      sourceType: "script"
+    }
+  },
 ]);

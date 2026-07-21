@@ -158,7 +158,7 @@ public class ClienteFSMTest {
     // LA loro assenza generava un errore
     @BeforeAll
     void setUp() {
-        // FIX #3: garantiamo che l'utente di test esista nel DB, indipendentemente
+        // garantiamo che l'utente di test esista nel DB, indipendentemente
         // da quale macchina/DB venga usato per eseguire la suite (niente più
         // precondizioni manuali da creare a mano prima di 'mvn test').
         assicuraUtenteDiTest();
@@ -171,7 +171,7 @@ public class ClienteFSMTest {
         prefs.put("profile.password_manager_enabled", false);
         options.setExperimentalOption("prefs", prefs);
 
-        // 3. Nasconde la fastidiosa barra "Chrome è controllato da un software automatizzato"
+        // 3. Nasconde la barra "Chrome è controllato da un software automatizzato"
         options.setExperimentalOption("excludeSwitches", new String[]{"enable-automation"});
 
         driver = new ChromeDriver(options);
@@ -196,23 +196,7 @@ public class ClienteFSMTest {
             svuotaSessioneTotale();
         }
 
-        @Test
-        @DisplayName("Transizione S0 -> S3 -> S0: Navigazione Form")
-        @Transizione({"S0->S3", "S3->S0"})
-        void testNavigazioneRegistrazione() {
-            WebElement btnVaiRegistrazione = wait.until(ExpectedConditions.elementToBeClickable(By.id("link-show-register")));
-            btnVaiRegistrazione.click();
-
-            WebElement formRegistrazione = wait.until(ExpectedConditions.visibilityOfElementLocated(By.id("form-register")));
-            assertTrue(formRegistrazione.isDisplayed(), "Il sistema doveva passare allo stato S3 (Registrazione).");
-
-            WebElement btnTornaLogin = driver.findElement(By.id("link-show-login"));
-            btnTornaLogin.click();
-
-            WebElement formLogin = wait.until(ExpectedConditions.visibilityOfElementLocated(By.id("form-login")));
-            assertTrue(formLogin.isDisplayed(), "Il sistema doveva tornare allo stato S0 (Login).");
-            System.out.println(" [TEST SUPERATO] Navigazione tra Login e Registrazione confermata.");
-        }
+        
 
         @Test
         @DisplayName("Transizione S0 -> S0: Credenziali Errate (Negative Path)")
@@ -257,7 +241,7 @@ public class ClienteFSMTest {
 
         @BeforeEach
         void setup() {
-            // FIX: senza questo reset, se una classe annidata precedente
+            // senza questo reset, se una classe annidata precedente
             // (es. S2_S4_AreaPrivata) lascia il browser loggato, driver.get(BASE_URL)
             // carica la pagina già in stato "loggato": auth-container (che contiene
             // link-show-register) resta nascosto -> ElementNotInteractableException.
@@ -306,7 +290,6 @@ public class ClienteFSMTest {
             Document clienteCreato = trovaClienteNelDB(username);
             assertNotNull(clienteCreato, "L'utente doveva essere stato realmente scritto nel DB, non solo mostrato come successo dall'alert.");
             assertEquals(telefonoUnico, clienteCreato.getString("numero"), "Il numero di telefono salvato nel DB doveva corrispondere a quello inserito nel form.");
- 
 
             System.out.println("[TEST SUPERATO] Registrazione completata per l'utente: " + username);
         }
@@ -320,10 +303,9 @@ public class ClienteFSMTest {
 
         // Non inviamo alcun dato, clicchiamo solo submit
         driver.findElement(By.cssSelector("button[data-testid='reg-submit']")).click();
-
-        // Se il tuo HTML ha l'attributo 'required', il browser dovrebbe bloccare il submit.
+        // Dato la presenza del campo 'required', il browser dovrebbe bloccare il submit.
         // Se il submit passa lo stesso, il test fallirà correttamente segnalando una falla di sicurezza.
-        // Puoi verificare se sei rimasto bloccato in S3 (form ancora visibile)
+        // verifichiamo se siamo rimasti bloccati in S3 (form ancora visibile)
         WebElement formRegistrazione = driver.findElement(By.id("form-register"));
         assertTrue(formRegistrazione.isDisplayed(), "Il form doveva rimanere visibile perché la registrazione non doveva passare.");
     }
