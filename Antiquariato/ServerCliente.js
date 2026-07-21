@@ -92,31 +92,6 @@ const OrdineSchema = new mongoose.Schema({
 });
 const Ordine = mongoose.model('Ordine', OrdineSchema);
 
-const VendiOperaSchema = new mongoose.Schema({
-  nomeCliente: String,
-  numero: String,
-  nome: String,
-  descrizione: String,
-  immagine1: [Buffer],
-  immagine2: [Buffer],
-  immagine3: [Buffer],
-  immagine4: [Buffer],
-  tecnica: String,
-  dimensione: String,
-  peso: String,
-  altezza: String,
-  prezzo: String
-});
-const VendiOpera = mongoose.model('VendiOpera', VendiOperaSchema);
-
-const OffertaSchema = new mongoose.Schema({
-  nomeCliente: String,
-  nome: String,
-  prezzo: String,
-  stato: String
-});
-const Offerta = mongoose.model('Offerta', OffertaSchema);
-
 const gestoreConnection = mongoose.createConnection('mongodb://127.0.0.1:27017/Gestore');
 const OperaSchema = new mongoose.Schema({
   codice: String,
@@ -133,10 +108,6 @@ const Opera = gestoreConnection.model('Opera', OperaSchema);
 // File Paths Relativi
 const opereFilePath = path.join(__dirname, 'Opere.json');
 const ordiniFilePath = path.join(__dirname, 'Ordini.json');
-const vendiOpereFilePath = path.join(__dirname, 'VendiOpere.json');
-const richiesteFilePath = path.join(__dirname, 'Richieste.json');
-const statoFilePath = path.join(__dirname, 'stato.json');
-const reportVenditeFilePath = path.join(__dirname, 'ReportVendite.json');
 
 // --- HELPER FUNCTIONS ---
 
@@ -408,57 +379,6 @@ app.post('/visualizzaCarrello', requireClienteAuth, async (req, res) => {
     res.status(500).json({ message: 'Errore durante la gestione della richiesta' });
   }
 });
-
-// ACQUISTA
-
-// // VENDI OPERA (Proposta cliente)
-// app.post('/VendiOpera', async (req, res) => {
-//   try {
-//     const newOpera = new VendiOpera(req.body);
-//     await newOpera.save();
-
-//     safeAppendToJsonFile(vendiOpereFilePath, newOpera);
-//     res.json({ riepilogo: `OPERA REGISTRATA nomeCliente:${newOpera.nomeCliente} nome:${newOpera.nome} prezzo:${newOpera.prezzo}` });
-//   } catch (error) {
-//     console.error('Errore durante la proposta di vendita:', error);
-//     res.status(500).json({ message: 'Errore durante la registrazione' });
-//   }
-// });
-
-// // VISUALIZZA OFFERTA
-// app.get('/visualizzaOfferta', (req, res) => {
-//   try {
-//     if (!fs.existsSync(richiesteFilePath)) return res.json([]);
-//     const opere = JSON.parse(fs.readFileSync(richiesteFilePath, 'utf-8') || '[]');
-//     res.json(opere);
-//   } catch (error) {
-//     console.error('Errore lettura offerte:', error);
-//     res.status(500).json({ message: "Errore durante l'operazione di lettura del file" });
-//   }
-// });
-
-// // ACCETTA OFFERTA
-// app.post('/accettaOfferta', async (req, res) => {
-//   const statiValidi = ['accetto', 'proponi', 'rifiuta'];
-//   if (!statiValidi.includes(req.body.stato)) {
-//     return res.status(400).json({ message: 'Lo stato fornito non è valido' });
-//   }
-
-//   try {
-//     const newOfferta = new Offerta(req.body);
-//     await newOfferta.save();
-
-//     if (newOfferta.stato === 'accetto') {
-//       safeAppendToJsonFile(reportVenditeFilePath, newOfferta);
-//     }
-
-//     safeAppendToJsonFile(statoFilePath, newOfferta);
-//     res.json({ riepilogo: `OFFERTA REGISTRATA nomeCliente:${newOfferta.nomeCliente} nome:${newOfferta.nome} prezzo:${newOfferta.prezzo} stato:${newOfferta.stato}` });
-//   } catch (error) {
-//     console.error('Errore accettazione offerta:', error);
-//     res.status(500).json({ message: 'Errore durante la registrazione' });
-//   }
-// });
 
 // Avvio nativo dell'applicazione Express
 app.listen(PORT, () => {

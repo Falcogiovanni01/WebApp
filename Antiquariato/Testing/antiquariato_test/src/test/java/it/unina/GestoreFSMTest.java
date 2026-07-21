@@ -286,30 +286,6 @@ public class GestoreFSMTest {
             System.out.println("[TEST SUPERATO] Navigazione ed elaborazione Report Acquisti completata con successo.");
         }
 
-        @Test
-        @DisplayName("Transizione S2 -> Report: Visualizzazione Report Vendite")
-        @Transizione({"S2->S5", "S5->S5"})
-        void testReportVendite() {
-            // 1. Clicchiamo sulla tab Offerte / Report
-            WebElement btnOfferte = wait.until(ExpectedConditions.elementToBeClickable(By.cssSelector("button[data-target='tab-offerte']")));
-            btnOfferte.click();
-
-            // 2. Verifica intermedia di visibilità della tab
-            WebElement tabOfferte = wait.until(ExpectedConditions.visibilityOfElementLocated(By.id("tab-offerte")));
-            assertTrue(tabOfferte.isDisplayed(), "La sezione Offerte/Report doveva essere visibile a schermo.");
-
-            // 3. Interagiamo con il bottone specifico del Report Vendite
-            WebElement btnRepVendite = driver.findElement(By.id("btn-rep-vendite"));
-            btnRepVendite.click();
-
-            // 4. Verifica finale sulla comparsa del box dei risultati
-            WebElement reportResults = wait.until(ExpectedConditions.visibilityOfElementLocated(By.id("report-results")));
-            assertTrue(reportResults.isDisplayed(), "Il pannello dei risultati del report vendite deve essere visibile.");
-            
-            System.out.println(" [TEST SUPERATO] Navigazione ed elaborazione Report Vendite completata con successo.");
-        }
-
-
 
         @Test
         @DisplayName("Transizione S2 -> S0: Logout e Distruzione Sessione")

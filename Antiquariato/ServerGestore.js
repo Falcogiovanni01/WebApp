@@ -43,19 +43,9 @@ const Opera = mongoose.model('Opera', OperaSchema);
 
 // File Paths relativi e sicuri
 const opereFilePath = path.join(__dirname, 'Opere.json');
-const richiesteFilePath = path.join(__dirname, 'Richieste.json');
 const ordiniFilePath = path.join(__dirname, 'Ordini.json');
 const statoFilePath = path.join(__dirname, 'stato.json');
-const reportVenditeFilePath = path.join(__dirname, 'ReportVendite.json');
 
-// --- UTILITIES ---
-
-function logAction(action, details) {
-    const logEntry = `${new Date().toISOString()} - ${action}: ${JSON.stringify(details)}\n`;
-    fs.appendFile(path.join(__dirname, 'log.txt'), logEntry, (err) => {
-        if (err) console.error('Errore durante la scrittura del log:', err);
-    });
-}
 
 // MIDDLEWARE DI AUTENTICAZIONE
 function requireAuth(req, res, next) {
@@ -131,7 +121,7 @@ app.post('/AggiungiOpera',requireAuth,  async (req, res) => {
 // Modifica Opera
 app.post('/ModificaOpera', requireAuth,  async (req, res) => {
     try {
-        // FIX: Cerchiamo SOLO per codice. Il nome può essere cambiato dall'utente!
+        // Cerchiamo SOLO per codice. 
         const condition = { codice: req.body.codice };
         const update = { $set: { ...req.body } };
         
@@ -165,7 +155,7 @@ app.post('/ModificaOpera', requireAuth,  async (req, res) => {
 // Rimuovi Opera
 app.post('/RimuoviOpera', requireAuth, async (req, res) => {
     try {
-        // FIX: Cerchiamo SOLO per codice per non rischiare errori di battitura sul nome
+        // FIX: Cerchiamo SOLO per codice 
         const condition = { codice: req.body.codice };
         const result = await Opera.findOne(condition);
         
@@ -235,33 +225,6 @@ app.get('/visualizzaSceltaClient', requireAuth, (req, res) => {
     } catch (error) {
         console.error('Errore lettura stati:', error);
         res.status(500).json({ message: 'Errore di lettura' });
-    }
-});
-
-// Report delle Vendite Accettate (Risolto bug di riferimento e proprietà non corrispondenti)
-app.get('/reportVendite', requireAuth, (req, res) => {
-    try {
-        if (!fs.existsSync(reportVenditeFilePath)) return res.json([]);
-        const leggiFile = fs.readFileSync(reportVenditeFilePath, 'utf-8');
-        const vendite = leggiFile ? JSON.parse(leggiFile) : [];
-
-        const aggregazione = {};
-        vendite.forEach((vendita) => {
-            // Mappatura coerente con i campi di Offerta salvati dal client (nomeCliente e prezzo)
-            const utente = vendita.nomeCliente || 'Sconosciuto';
-            const prezzo = Math.floor(Number(vendita.prezzo || 0));
-
-            if (!aggregazione[utente]) {
-                aggregazione[utente] = { nome: utente, somma: 0, numeroVendite: 0 };
-            }
-            aggregazione[utente].somma += prezzo;
-            aggregazione[utente].numeroVendite += 1;
-        });
-
-        res.json(Object.values(aggregazione));
-    } catch (error) {
-        console.error('Errore elaborazione report vendite:', error);
-        res.status(500).json({ message: 'Errore di elaborazione' });
     }
 });
 

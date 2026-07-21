@@ -152,5 +152,4 @@ document.addEventListener('DOMContentLoaded', async () => {
 
     document.getElementById('btn-vis-offerte')?.addEventListener('click', () => fetchAndDisplay('/visualizzaOpere'));
     document.getElementById('btn-rep-acquisti')?.addEventListener('click', () => fetchAndDisplay('/reportAcquisti'));
-    document.getElementById('btn-rep-vendite')?.addEventListener('click', () => fetchAndDisplay('/reportVendite'));
 });

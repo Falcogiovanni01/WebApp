@@ -444,5 +444,21 @@
     ],
     "_id": "6a4fc64202d51ea4c9980a39",
     "__v": 0
+  },
+  {
+    "id": 94556,
+    "utente": "PROVA UTENTE",
+    "data": "2026-07-21",
+    "prezzo": 150,
+    "prodottiAcquistati": [
+      {
+        "codice": "TEST-1783441946359",
+        "prezzo": "150",
+        "quantita": 1,
+        "_id": "6a5fdc0971c0d472ac1190cf"
+      }
+    ],
+    "_id": "6a5fdc0971c0d472ac1190ce",
+    "__v": 0
   }
 ]
