@@ -1,0 +1,80 @@
+<!DOCTYPE html>
+<html lang="it">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>Gestore Antiquariato</title>
+    <script src="https://cdn.tailwindcss.com"></script>
+</head>
+<body class="bg-slate-50 min-h-screen text-slate-800">
+    
+    <div id="login-overlay" class="fixed inset-0 bg-slate-900 flex items-center justify-center z-50">
+        <form id="form-login-gestore" class="bg-white p-8 rounded-lg shadow-xl w-80">
+            <h2 class="text-xl font-bold mb-4 text-center">Proprietario</h2>
+            <input type="text" id="user" placeholder="Username" class="border p-2 mb-2 w-full rounded" required>
+            <input type="password" id="pass" placeholder="Password" class="border p-2 mb-4 w-full rounded" required>
+            <button type="submit" class="bg-blue-600 text-white w-full py-2 rounded font-bold hover:bg-blue-700">ACCEDI</button>
+        </form>
+    </div>
+
+    <header class="bg-slate-900 text-white p-6 shadow-md flex justify-between items-center">
+        <h1 class="text-3xl font-bold">Pannello di Controllo Gestore</h1>
+        <button id="btn-logout-gestore" class="bg-red-600 hover:bg-red-700 px-4 py-2 rounded font-bold transition">Esci</button>
+    </header>
+
+    <main class="container mx-auto p-6 mt-6 max-w-4xl bg-white rounded-lg shadow">
+        
+        <nav class="flex border-b mb-6" id="tabs-container">
+            <button data-target="tab-aggiungi" class="tab-btn flex-1 py-3 text-center font-bold text-blue-600 border-b-2 border-blue-600">Aggiungi</button>
+            <button data-target="tab-modifica" class="tab-btn flex-1 py-3 text-center font-semibold text-slate-500 hover:text-blue-500">Modifica</button>
+            <button data-target="tab-rimuovi" class="tab-btn flex-1 py-3 text-center font-semibold text-slate-500 hover:text-blue-500">Rimuovi</button>
+            <button data-target="tab-offerte" class="tab-btn flex-1 py-3 text-center font-semibold text-slate-500 hover:text-blue-500">Offerte / Report</button>
+        </nav>
+
+        <div id="content-area">
+            
+            <section id="tab-aggiungi" class="tab-content">
+                <h2 class="text-xl mb-4 font-bold">Aggiungi Nuova Opera</h2>
+                <form id="form-aggiungi" class="flex flex-col gap-3">
+                    <input type="text" name="codice" placeholder="Codice" required class="border p-2 rounded">
+                    <input type="text" name="nome" placeholder="Nome Opera" required class="border p-2 rounded">
+                    <textarea name="descrizione" placeholder="Descrizione" rows="3" class="border p-2 rounded"></textarea>
+                    <input type="number" name="prezzo" placeholder="Prezzo" required class="border p-2 rounded">
+                    <input type="text" name="tecnica" placeholder="Tecnica" class="border p-2 rounded">
+                    <button type="submit" data-testid="btn-submit-aggiungi" class="bg-green-600 text-white p-2 rounded mt-2 hover:bg-green-700">Conferma Aggiunta</button>
+                </form>
+            </section>
+
+            <section id="tab-modifica" class="tab-content hidden">
+                <h2 class="text-xl mb-4 font-bold">Modifica Opera Esistente</h2>
+                <form id="form-modifica" class="flex flex-col gap-3">
+                    <input type="text" name="codice" placeholder="Codice dell'opera da modificare" required class="border p-2 rounded">
+                    <input type="text" name="nome" placeholder="Nuovo Nome" required class="border p-2 rounded">
+                    <input type="number" name="prezzo" placeholder="Nuovo Prezzo" class="border p-2 rounded">
+                    <button type="submit" data-testid="btn-submit-modifica" class="bg-blue-600 text-white p-2 rounded mt-2 hover:bg-blue-700">Applica Modifiche</button>
+                </form>
+            </section>
+
+            <section id="tab-rimuovi" class="tab-content hidden">
+                <h2 class="text-xl mb-4 font-bold">Rimuovi Opera</h2>
+                <form id="form-rimuovi" class="flex flex-col gap-3">
+                    <input type="text" name="codice" placeholder="Codice dell'opera da eliminare" required class="border border-red-300 p-2 rounded">
+                   <button type="submit" data-testid="btn-submit-rimuovi" class="bg-red-600 text-white p-2 rounded mt-2 hover:bg-red-700">Elimina Definitivamente</button>
+                </form>
+            </section>
+
+            <section id="tab-offerte" class="tab-content hidden">
+                <h2 class="text-xl mb-4 font-bold">Gestione Offerte e Report</h2>
+                <div class="grid grid-cols-2 gap-4">
+                    <button id="btn-rep-acquisti" class="bg-slate-200 p-3 rounded hover:bg-slate-300">Report Acquisti</button>
+                    <button id="btn-rep-vendite" class="bg-slate-200 p-3 rounded hover:bg-slate-300">Report Vendite</button>
+                </div>
+                <div id="report-results" class="mt-6 p-4 bg-slate-100 rounded min-h-[150px] font-mono text-sm hidden"></div>
+            </section>
+
+        </div>
+    </main>
+
+    <script src="app.js"></script>
+</body>
+</html>

@@ -1,0 +1,4 @@
+{
+  "reporter": ["text", "html"],
+  "exclude": ["node_modules/**", "coverage/**", "**/*.test.js"]
+}

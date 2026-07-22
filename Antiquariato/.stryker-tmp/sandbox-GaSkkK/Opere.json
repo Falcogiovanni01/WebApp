@@ -1,0 +1,203 @@
+[
+  {
+    "codice": "TEST-1783441946359",
+    "nome": "Opera Autogenerata",
+    "descrizione": "Opera creata da Selenium per test automatizzato",
+    "prezzo": "150",
+    "immagine1": [],
+    "immagine2": [],
+    "immagine3": [],
+    "immagine4": [],
+    "tecnica": "Automazione",
+    "_id": "6a4d2a1a4ac5370cb9eca33d",
+    "__v": 0
+  },
+  {
+    "codice": "MOD-1783441974975",
+    "nome": "Opera da Modificare",
+    "descrizione": "",
+    "prezzo": "150",
+    "immagine1": [],
+    "immagine2": [],
+    "immagine3": [],
+    "immagine4": [],
+    "tecnica": "",
+    "_id": "6a4d2a37b5d8de730574c849",
+    "__v": 0
+  },
+  {
+    "codice": "MOD-1783441976564",
+    "nome": "Titolo Modificato!",
+    "descrizione": "",
+    "prezzo": "9999",
+    "immagine1": [],
+    "immagine2": [],
+    "immagine3": [],
+    "immagine4": [],
+    "tecnica": "",
+    "_id": "6a4d2a38df8246a21646c21d",
+    "__v": 0
+  },
+  {
+    "codice": "TEST-1783442782455",
+    "nome": "Opera Autogenerata",
+    "descrizione": "Opera creata da Selenium per test automatizzato",
+    "prezzo": "150",
+    "tecnica": "Automazione",
+    "_id": "6a4d2d5e3fa324d7cde26de1",
+    "__v": 0
+  },
+  {
+    "codice": "MOD-1783442783959",
+    "nome": "Opera da Modificare",
+    "descrizione": "",
+    "prezzo": "150",
+    "tecnica": "",
+    "_id": "6a4d2d602f84fe3a0d939ad5",
+    "__v": 0
+  },
+  {
+    "codice": "MOD-1783442785297",
+    "nome": "Titolo Modificato!",
+    "descrizione": "",
+    "prezzo": "9999",
+    "tecnica": "",
+    "_id": "6a4d2d6167f0f73b2edfeb73",
+    "__v": 0
+  },
+  {
+    "codice": "TEST-1783458521231",
+    "nome": "Opera Autogenerata",
+    "descrizione": "Opera creata da Selenium per test automatizzato",
+    "prezzo": "150",
+    "tecnica": "Automazione",
+    "_id": "6a4d6ad9998cec5bccc0e294",
+    "__v": 0
+  },
+  {
+    "codice": "MOD-1783458522757",
+    "nome": "Opera da Modificare",
+    "descrizione": "",
+    "prezzo": "150",
+    "tecnica": "",
+    "_id": "6a4d6ada97c156e3bd95e6ab",
+    "__v": 0
+  },
+  {
+    "codice": "MOD-1783458524108",
+    "nome": "Titolo Modificato!",
+    "descrizione": "",
+    "prezzo": "9999",
+    "tecnica": "",
+    "_id": "6a4d6adc6eb4548fa794aef9",
+    "__v": 0
+  },
+  {
+    "codice": "TEST-1783529188946",
+    "nome": "Opera Autogenerata",
+    "descrizione": "Opera creata da Selenium per test automatizzato",
+    "prezzo": "150",
+    "tecnica": "Automazione",
+    "_id": "6a4e7ee532cf50800405b6e9",
+    "__v": 0
+  },
+  {
+    "codice": "MOD-1783529189936",
+    "nome": "Opera da Modificare",
+    "descrizione": "",
+    "prezzo": "150",
+    "tecnica": "",
+    "_id": "6a4e7ee6f1effe257a12a17d",
+    "__v": 0
+  },
+  {
+    "codice": "MOD-1783529191244",
+    "nome": "Titolo Modificato!",
+    "descrizione": "",
+    "prezzo": "9999",
+    "tecnica": "",
+    "_id": "6a4e7ee7c5f6e5d2e3976b49",
+    "__v": 0
+  },
+  {
+    "codice": "TEST-1783608250714",
+    "nome": "Opera Autogenerata",
+    "descrizione": "Opera creata da Selenium per test automatizzato",
+    "prezzo": "150",
+    "tecnica": "Automazione",
+    "_id": "6a4fb3ba1fb62cf34fdbf6da",
+    "__v": 0
+  },
+  {
+    "codice": "MOD-1783608252783",
+    "nome": "Opera da Modificare",
+    "descrizione": "",
+    "prezzo": "150",
+    "tecnica": "",
+    "_id": "6a4fb3bc10cb62767b25649b",
+    "__v": 0
+  },
+  {
+    "codice": "MOD-1783608254112",
+    "nome": "Titolo Modificato!",
+    "descrizione": "",
+    "prezzo": "9999",
+    "tecnica": "",
+    "_id": "6a4fb3be06455381b2058561",
+    "__v": 0
+  },
+  {
+    "codice": "TEST-1783608267737",
+    "nome": "Opera Autogenerata",
+    "descrizione": "Opera creata da Selenium per test automatizzato",
+    "prezzo": "150",
+    "tecnica": "Automazione",
+    "_id": "6a4fb3cbc4f9b0bc33787c01",
+    "__v": 0
+  },
+  {
+    "codice": "MOD-1783608269302",
+    "nome": "Opera da Modificare",
+    "descrizione": "",
+    "prezzo": "150",
+    "tecnica": "",
+    "_id": "6a4fb3cdc58489b9ae272c7f",
+    "__v": 0
+  },
+  {
+    "codice": "MOD-1783608270629",
+    "nome": "Titolo Modificato!",
+    "descrizione": "",
+    "prezzo": "9999",
+    "tecnica": "",
+    "_id": "6a4fb3cecd8abda8c49a61ef",
+    "__v": 0
+  },
+  {
+    "codice": "TEST-1783613693641",
+    "nome": "Opera Autogenerata",
+    "descrizione": "Opera creata da Selenium per test automatizzato",
+    "prezzo": "150",
+    "tecnica": "Automazione",
+    "_id": "6a4fc8fde3363ad701520ca9",
+    "__v": 0
+  },
+  {
+    "codice": "MOD-1783613695225",
+    "nome": "Opera da Modificare",
+    "descrizione": "",
+    "prezzo": "150",
+    "tecnica": "",
+    "_id": "6a4fc8ffe3363ad701520cab",
+    "__v": 0
+  },
+  {
+    "codice": "MOD-1783613696561",
+    "nome": "Titolo Modificato!",
+    "descrizione": "",
+    "prezzo": "9999",
+    "tecnica": "",
+    "_id": "6a4fc900e3363ad701520cae",
+    "__v": 0
+  }
+]

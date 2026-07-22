@@ -1,0 +1,114 @@
+body{
+    width:1522px ; 
+    height:740px ; 
+}
+
+header
+{
+    height:25% ; 
+    width:auto ; 
+    background-color: #522403bc; 
+    
+}
+header h1{
+    color:white ; 
+    font-size: 3em; 
+   /* border:black solid 2px ; */
+    text-align: center ; 
+   
+}
+h1.titolo{
+padding:30px ;  
+}
+
+main{
+    height:50% ;
+    width:auto ;  
+    /*border:yellow solid 2px ; */
+}
+
+main .contenitore 
+{
+    height:100% ; 
+    width:auto ;  
+   /* border:yellow solid 2px ; */
+    text-align: center ;
+    background-image: url(R.jpg);
+    background-repeat: no-repeat;
+    background-size: cover ;
+    background-position: center ;
+}
+
+main .contenitore .tabs
+{
+    height: 10%; 
+    width:auto ; 
+}
+.tabs a{
+    border: 1px solid #684c4c ; 
+    border-radius:10px ; 
+    font-size:22px ; 
+}
+main .contenitore .tabs a span{
+    height:10% ; 
+    width:auto ; 
+    padding: 5% ; 
+    
+    
+}
+.contenuto
+{
+    height:90%  ; 
+    width:auto ; 
+    overflow-y:auto ; 
+}
+footer{
+    height:25%;
+    width: auto ;  
+   /* border:blue solid 2px ; */
+   background-color: #522403bc; 
+}
+
+footer .contenitore_footer
+{
+    height:100% ; 
+    width:auto ; 
+    
+}
+.contatti
+{
+ /*   border:2px solid red ; */
+    float:left ; 
+    margin-left:200px ; 
+    margin-top:50px ; 
+    
+}
+.contatti ul 
+{
+    color:white ; 
+    font-weight:bold ; 
+}
+  
+.mappa_sito
+{
+   /* border: 2px solid blue  ; */
+    float:right ; 
+    margin-right:200px ; 
+    margin-top:50px ; 
+}
+.mappa_sito nav a
+{
+   padding:5px ; 
+   color:white ; 
+  
+}
+.mappa_sito nav a:hover{
+    background-color: #c1b1b1; /* Colore di sfondo al passaggio del mouse */
+    color: white; /* Colore del testo al passaggio del mouse */
+    transition: background-color 0.3s ease, color 0.3s ease; /* Effetto di transizione per una transizione più fluida */
+}
+main .contenitore .tabs a:hover {
+    background-color: #684c4c; /* Colore di sfondo al passaggio del mouse */
+    color: white; /* Colore del testo al passaggio del mouse */
+    transition: background-color 0.3s ease, color 0.3s ease; /* Effetto di transizione per una transizione più fluida */
+}

@@ -1,0 +1,4 @@
+-------------------------------------------------------------------------------
+Test set: it.unina.ClienteFSMTest$S0_S3_AccessoPubblico
+-------------------------------------------------------------------------------
+Tests run: 3, Failures: 0, Errors: 0, Skipped: 0, Time elapsed: 1.765 s -- in it.unina.ClienteFSMTest$S0_S3_AccessoPubblico

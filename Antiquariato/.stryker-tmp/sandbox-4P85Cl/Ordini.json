@@ -1,0 +1,448 @@
+[
+  {
+    "id": 32369,
+    "utente": "Gio",
+    "data": "2026-06-30",
+    "prezzo": 1250,
+    "prodottiAcquistati": [
+      {
+        "codice": "009",
+        "prezzo": "1000",
+        "quantita": 1,
+        "_id": "6a43e055470683e489d984f1"
+      },
+      {
+        "codice": "112",
+        "prezzo": "250",
+        "quantita": 1,
+        "_id": "6a43e055470683e489d984f2"
+      }
+    ],
+    "_id": "6a43e055470683e489d984f0",
+    "__v": 0
+  },
+  {
+    "id": 91878,
+    "utente": "Felice",
+    "data": "2026-06-30",
+    "prezzo": 1000,
+    "prodottiAcquistati": [
+      {
+        "codice": "007",
+        "prezzo": "1000",
+        "quantita": 1,
+        "_id": "6a43e1a0ffd080cd5831637f"
+      }
+    ],
+    "_id": "6a43e1a0ffd080cd5831637e",
+    "__v": 0
+  },
+  {
+    "id": 99710,
+    "utente": "Gio",
+    "data": "2026-06-30",
+    "prezzo": 3000,
+    "prodottiAcquistati": [
+      {
+        "codice": "114",
+        "prezzo": "3000",
+        "quantita": 1,
+        "_id": "6a43e9b51378c9c769000ca4"
+      }
+    ],
+    "_id": "6a43e9b51378c9c769000ca3",
+    "__v": 0
+  },
+  {
+    "id": 18748,
+    "utente": "Gio",
+    "data": "2026-06-30",
+    "prezzo": 100,
+    "prodottiAcquistati": [
+      {
+        "codice": "0001",
+        "prezzo": "100",
+        "quantita": 1,
+        "_id": "6a43e9c71378c9c769000cb1"
+      }
+    ],
+    "_id": "6a43e9c71378c9c769000cb0",
+    "__v": 0
+  },
+  {
+    "id": 60637,
+    "utente": "Gio",
+    "data": "2026-06-30",
+    "prezzo": 1000,
+    "prodottiAcquistati": [
+      {
+        "codice": "009",
+        "prezzo": "1000",
+        "quantita": 1,
+        "_id": "6a43e9ce1378c9c769000cbe"
+      }
+    ],
+    "_id": "6a43e9ce1378c9c769000cbd",
+    "__v": 0
+  },
+  {
+    "id": 8391,
+    "utente": "Gio",
+    "data": "2026-06-30",
+    "prezzo": 1000,
+    "prodottiAcquistati": [
+      {
+        "codice": "002",
+        "prezzo": "1000",
+        "quantita": 1,
+        "_id": "6a43eafd4fc1783523f49c48"
+      }
+    ],
+    "_id": "6a43eafc4fc1783523f49c47",
+    "__v": 0
+  },
+  {
+    "id": 42603,
+    "utente": "Francesco",
+    "data": "2026-07-01",
+    "prezzo": 100,
+    "prodottiAcquistati": [
+      {
+        "quantita": 1,
+        "_id": "6a453458296797e4b45f3a61"
+      },
+      {
+        "codice": "PR",
+        "prezzo": "100",
+        "quantita": 1,
+        "_id": "6a453458296797e4b45f3a62"
+      }
+    ],
+    "_id": "6a453458296797e4b45f3a60",
+    "__v": 0
+  },
+  {
+    "id": 34555,
+    "utente": "Gio",
+    "data": "2026-07-02",
+    "prezzo": 1000,
+    "prodottiAcquistati": [
+      {
+        "codice": "Opera_04",
+        "prezzo": "1000",
+        "quantita": 1,
+        "_id": "6a466f8661e33f95af87d2ec"
+      }
+    ],
+    "_id": "6a466f8661e33f95af87d2eb",
+    "__v": 0
+  },
+  {
+    "id": 67808,
+    "utente": "Gio",
+    "data": "2026-07-05",
+    "prezzo": 500,
+    "prodottiAcquistati": [
+      {
+        "codice": "110",
+        "prezzo": "250",
+        "quantita": 1,
+        "_id": "6a4a8775e8393be3b5ac8603"
+      },
+      {
+        "codice": "110",
+        "prezzo": "250",
+        "quantita": 1,
+        "_id": "6a4a8775e8393be3b5ac8604"
+      }
+    ],
+    "_id": "6a4a8775e8393be3b5ac8602",
+    "__v": 0
+  },
+  {
+    "id": 51717,
+    "utente": "PROVA UTENTE",
+    "data": "2026-07-06",
+    "prezzo": 500,
+    "prodottiAcquistati": [
+      {
+        "quantita": 1,
+        "_id": "6a4bd8cd78b523324b6c6bca"
+      },
+      {
+        "quantita": 1,
+        "_id": "6a4bd8cd78b523324b6c6bcb"
+      },
+      {
+        "codice": "112",
+        "prezzo": "250",
+        "quantita": 1,
+        "_id": "6a4bd8cd78b523324b6c6bcc"
+      },
+      {
+        "codice": "112",
+        "prezzo": "250",
+        "quantita": 1,
+        "_id": "6a4bd8cd78b523324b6c6bcd"
+      }
+    ],
+    "_id": "6a4bd8cd78b523324b6c6bc9",
+    "__v": 0
+  },
+  {
+    "id": 4211,
+    "utente": "PROVA UTENTE",
+    "data": "2026-07-06",
+    "prezzo": 5000,
+    "prodottiAcquistati": [
+      {
+        "codice": "113",
+        "prezzo": "5000",
+        "quantita": 1,
+        "_id": "6a4bd8d678b523324b6c6bdb"
+      }
+    ],
+    "_id": "6a4bd8d678b523324b6c6bda",
+    "__v": 0
+  },
+  {
+    "id": 10444,
+    "utente": "PROVA UTENTE",
+    "data": "2026-07-06",
+    "prezzo": 300,
+    "prodottiAcquistati": [
+      {
+        "codice": "115",
+        "prezzo": "300",
+        "quantita": 1,
+        "_id": "6a4bda683970059159284275"
+      }
+    ],
+    "_id": "6a4bda683970059159284274",
+    "__v": 0
+  },
+  {
+    "id": 5378,
+    "utente": "PROVA UTENTE",
+    "data": "2026-07-06",
+    "prezzo": 1000,
+    "prodottiAcquistati": [
+      {
+        "codice": "222",
+        "prezzo": "1000",
+        "quantita": 1,
+        "_id": "6a4bdb54af17411d3984f019"
+      }
+    ],
+    "_id": "6a4bdb54af17411d3984f018",
+    "__v": 0
+  },
+  {
+    "id": 91904,
+    "utente": "Gio",
+    "data": "2026-07-07",
+    "prezzo": 10,
+    "prodottiAcquistati": [
+      {
+        "codice": "NUOVO_pROVA",
+        "prezzo": "10",
+        "quantita": 1,
+        "_id": "6a4d27555e776239ed8c78cb"
+      }
+    ],
+    "_id": "6a4d27555e776239ed8c78ca",
+    "__v": 0
+  },
+  {
+    "id": 61541,
+    "utente": "PROVA UTENTE",
+    "data": "2026-07-07",
+    "prezzo": 50,
+    "prodottiAcquistati": [
+      {
+        "codice": "PROVA_01",
+        "prezzo": "50",
+        "quantita": 1,
+        "_id": "6a4d286f21c9a35851a1e014"
+      }
+    ],
+    "_id": "6a4d286f21c9a35851a1e013",
+    "__v": 0
+  },
+  {
+    "id": 24765,
+    "utente": "PROVA UTENTE",
+    "data": "2026-07-07",
+    "prezzo": 100,
+    "prodottiAcquistati": [
+      {
+        "codice": "Opera_01",
+        "prezzo": "100",
+        "quantita": 1,
+        "_id": "6a4d2b6ec83625e32a246c50"
+      }
+    ],
+    "_id": "6a4d2b6ec83625e32a246c4f",
+    "__v": 0
+  },
+  {
+    "id": 94036,
+    "utente": "PROVA UTENTE",
+    "data": "2026-07-07",
+    "prezzo": 30,
+    "prodottiAcquistati": [
+      {
+        "codice": "Opera_02",
+        "prezzo": "30",
+        "quantita": 1,
+        "_id": "6a4d2bebb955adf7ee1d241b"
+      }
+    ],
+    "_id": "6a4d2bebb955adf7ee1d241a",
+    "__v": 0
+  },
+  {
+    "id": 19426,
+    "utente": "PROVA UTENTE",
+    "data": "2026-07-07",
+    "prezzo": 5,
+    "prodottiAcquistati": [
+      {
+        "codice": "Opera_03",
+        "prezzo": "5",
+        "quantita": 1,
+        "_id": "6a4d6aace715d331d40bea1c"
+      }
+    ],
+    "_id": "6a4d6aace715d331d40bea1b",
+    "__v": 0
+  },
+  {
+    "id": 89592,
+    "utente": "PROVA UTENTE",
+    "data": "2026-07-08",
+    "prezzo": 150,
+    "prodottiAcquistati": [
+      {
+        "codice": "TEST-1783269810359",
+        "prezzo": "150",
+        "quantita": 1,
+        "_id": "6a4e77f3f1b45124cda13c0a"
+      }
+    ],
+    "_id": "6a4e77f3f1b45124cda13c09",
+    "__v": 0
+  },
+  {
+    "id": 68742,
+    "utente": "PROVA UTENTE",
+    "data": "2026-07-08",
+    "prezzo": 9999,
+    "prodottiAcquistati": [
+      {
+        "codice": "MOD-1783270642367",
+        "prezzo": "9999",
+        "quantita": 1,
+        "_id": "6a4e7827010978065797be43"
+      }
+    ],
+    "_id": "6a4e7827010978065797be42",
+    "__v": 0
+  },
+  {
+    "id": 71046,
+    "utente": "PROVA UTENTE",
+    "data": "2026-07-08",
+    "prezzo": 150,
+    "prodottiAcquistati": [
+      {
+        "codice": "MOD-1783351511240",
+        "prezzo": "150",
+        "quantita": 1,
+        "_id": "6a4e7841f27232b3c1e6b445"
+      }
+    ],
+    "_id": "6a4e7841f27232b3c1e6b444",
+    "__v": 0
+  },
+  {
+    "id": 95865,
+    "utente": "PROVA UTENTE",
+    "data": "2026-07-08",
+    "prezzo": 9999,
+    "prodottiAcquistati": [
+      {
+        "codice": "MOD-1783351512847",
+        "prezzo": "9999",
+        "quantita": 1,
+        "_id": "6a4e7fadfd2d8866d6395e0a"
+      }
+    ],
+    "_id": "6a4e7fadfd2d8866d6395e09",
+    "__v": 0
+  },
+  {
+    "id": 95268,
+    "utente": "PROVA UTENTE",
+    "data": "2026-07-09",
+    "prezzo": 150,
+    "prodottiAcquistati": [
+      {
+        "codice": "MOD-1783351552755",
+        "prezzo": "150",
+        "quantita": 1,
+        "_id": "6a4fb5efe105938c4f18d55b"
+      }
+    ],
+    "_id": "6a4fb5efe105938c4f18d55a",
+    "__v": 0
+  },
+  {
+    "id": 87537,
+    "utente": "PROVA UTENTE",
+    "data": "2026-07-09",
+    "prezzo": 9999,
+    "prodottiAcquistati": [
+      {
+        "codice": "MOD-1783351554312",
+        "prezzo": "9999",
+        "quantita": 1,
+        "_id": "6a4fba6fa0854a9e1576abf9"
+      }
+    ],
+    "_id": "6a4fba6fa0854a9e1576abf8",
+    "__v": 0
+  },
+  {
+    "id": 55377,
+    "utente": "PROVA UTENTE",
+    "data": "2026-07-09",
+    "prezzo": 150,
+    "prodottiAcquistati": [
+      {
+        "codice": "DEL-1783352513844",
+        "prezzo": "150",
+        "quantita": 1,
+        "_id": "6a4fc05bf49871aa9e5a77f1"
+      }
+    ],
+    "_id": "6a4fc05bf49871aa9e5a77f0",
+    "__v": 0
+  },
+  {
+    "id": 15784,
+    "utente": "PROVA UTENTE",
+    "data": "2026-07-09",
+    "prezzo": 150,
+    "prodottiAcquistati": [
+      {
+        "codice": "DEL-1783352800892",
+        "prezzo": "150",
+        "quantita": 1,
+        "_id": "6a4fc64202d51ea4c9980a3a"
+      }
+    ],
+    "_id": "6a4fc64202d51ea4c9980a39",
+    "__v": 0
+  }
+]

@@ -1,0 +1,4 @@
+-------------------------------------------------------------------------------
+Test set: it.unina.ClienteFSMTest$S3_Registrazione
+-------------------------------------------------------------------------------
+Tests run: 2, Failures: 0, Errors: 0, Skipped: 0, Time elapsed: 0.979 s -- in it.unina.ClienteFSMTest$S3_Registrazione

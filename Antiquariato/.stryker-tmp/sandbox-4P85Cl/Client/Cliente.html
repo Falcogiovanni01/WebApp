@@ -1,0 +1,71 @@
+<!DOCTYPE html>
+<html lang="it">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>Galleria d'Antiquariato</title>
+    <script src="https://cdn.tailwindcss.com"></script>
+</head>
+<body class="bg-slate-50 text-slate-800 font-sans min-h-screen flex flex-col">
+
+    <header class="bg-blue-900 text-white p-4 shadow-md flex justify-between items-center">
+        <h1 class="text-2xl font-bold">Galleria d'Antiquariato</h1>
+        <div id="user-info" class="hidden flex gap-4 items-center">
+            <span id="welcome-msg" class="font-semibold"></span>
+            <button id="btn-logout" data-testid="btn-logout" class="bg-red-500 hover:bg-red-600 px-4 py-2 rounded text-sm font-bold">Logout</button>
+        </div>
+    </header>
+
+    <main class="flex-grow container mx-auto p-6 max-w-5xl flex justify-center items-start pt-10">
+        
+        <div id="auth-container" class="w-full max-w-md bg-white p-8 rounded shadow-lg border border-slate-200">
+            
+            <form id="form-login" class="flex flex-col gap-4">
+                <h2 class="text-xl font-bold mb-2">Accesso Clienti</h2>
+                <input type="text" name="nome" placeholder="Username" required data-testid="login-username" class="border p-2 rounded">
+                <input type="password" name="password" placeholder="Password" required data-testid="login-password" class="border p-2 rounded">
+                <button type="submit" data-testid="login-submit" class="bg-blue-600 text-white p-2 rounded hover:bg-blue-700 font-bold">Accedi</button>
+                <p class="text-sm text-center mt-2">Non hai un account? <a href="#" id="link-show-register" class="text-blue-600 underline">Registrati</a></p>
+            </form>
+
+            <form id="form-register" class="flex flex-col gap-4 hidden">
+                <h2 class="text-xl font-bold mb-2">Nuova Registrazione</h2>
+                <input type="text" name="nome" placeholder="Username" required data-testid="reg-username" class="border p-2 rounded">
+                <input type="password" name="password" placeholder="Password" required data-testid="reg-password" class="border p-2 rounded">
+                <input type="text" name="numero" placeholder="Numero di Telefono" required data-testid="reg-phone" pattern="\d{10}" maxlength="10" inputmode="numeric" title="Il numero di telefono deve contenere esattamente 10 cifre" class="border p-2 rounded">
+                <input type="text" name="carta" placeholder="Numero Carta" required data-testid="reg-card" pattern="\d{16}" maxlength="16" inputmode="numeric" title="Il numero di carta deve contenere esattamente 16 cifre" class="border p-2 rounded">
+                <button type="submit" data-testid="reg-submit" class="bg-green-600 text-white p-2 rounded hover:bg-green-700 font-bold">Registrati</button>
+                <p class="text-sm text-center mt-2">Torna al <a href="#" id="link-show-login" class="text-blue-600 underline">Login</a></p>
+            </form>
+        </div>
+
+        <div id="main-app-container" class="w-full hidden bg-white rounded shadow-lg overflow-hidden border border-slate-200">
+            
+            <nav class="flex border-b bg-slate-100" id="client-tabs">
+                <button data-target="tab-catalogo" class="client-tab flex-1 py-4 text-center font-bold text-blue-700 border-b-2 border-blue-600">Catalogo Opere</button>
+                <button data-target="tab-carrello" class="client-tab flex-1 py-4 text-center font-semibold text-slate-500 hover:bg-slate-200">Il Mio Carrello</button>
+            </nav>
+
+            <div class="p-6">
+                <section id="tab-catalogo" class="client-content">
+                    <h2 class="text-2xl font-bold mb-4">Opere in Vendita</h2>
+                    <div id="catalog-grid" class="grid grid-cols-1 md:grid-cols-2 lg:grid-cols-3 gap-6">
+                        </div>
+                </section>
+
+                <section id="tab-carrello" class="client-content hidden">
+                    <h2 class="text-2xl font-bold mb-4">Il Tuo Carrello</h2>
+                    <div id="cart-list" class="flex flex-col gap-4 mb-6">
+                        </div>
+                    <button id="btn-acquista" data-testid="btn-acquista" class="w-full bg-green-600 text-white p-3 rounded font-bold hover:bg-green-700 hidden">Procedi all'Acquisto</button>
+                </section>
+
+               
+            </div>
+        </div>
+
+    </main>
+
+    <script src="app.js"></script>
+</body>
+</html>
