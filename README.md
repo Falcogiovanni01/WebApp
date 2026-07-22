@@ -87,9 +87,7 @@ ogni richiesta verso un'area protetta — login, carrello, acquisto. Il cookie `
 leggibile né manipolabile da JavaScript lato client, ed è l'unica fonte di verità sia per decidere
 cosa mostrare in interfaccia sia per autorizzare le operazioni sul backend. Se il cookie manca o
 non è valido, ogni endpoint protetto risponde `401` e il client riporta l'utente allo stato di
-login, senza eccezioni. Deliberatamente non si usa `localStorage` per l'autenticazione: uno storage
-lato client è per definizione fuori dal controllo del server, e non può essere l'unica barriera a
-protezione di una risorsa privata.
+login, senza eccezioni. 
 
 ### 5. Perché due server distinti, Gestore e Cliente?
 

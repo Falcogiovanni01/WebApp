@@ -460,5 +460,53 @@
     ],
     "_id": "6a5fdc0971c0d472ac1190ce",
     "__v": 0
+  },
+  {
+    "id": 47076,
+    "utente": "PROVA UTENTE",
+    "data": "2026-07-22",
+    "prezzo": 150,
+    "prodottiAcquistati": [
+      {
+        "codice": "MOD-1783441974975",
+        "prezzo": "150",
+        "quantita": 1,
+        "_id": "6a5ff030a9457b2393d6cd3c"
+      }
+    ],
+    "_id": "6a5ff030a9457b2393d6cd3b",
+    "__v": 0
+  },
+  {
+    "id": 70526,
+    "utente": "PROVA UTENTE",
+    "data": "2026-07-22",
+    "prezzo": 9999,
+    "prodottiAcquistati": [
+      {
+        "codice": "MOD-1783441976564",
+        "prezzo": "9999",
+        "quantita": 1,
+        "_id": "6a60a1d5a001606ec7f37181"
+      }
+    ],
+    "_id": "6a60a1d5a001606ec7f37180",
+    "__v": 0
+  },
+  {
+    "id": 57135,
+    "utente": "PROVA UTENTE",
+    "data": "2026-07-22",
+    "prezzo": 150,
+    "prodottiAcquistati": [
+      {
+        "codice": "TEST-1783442782455",
+        "prezzo": "150",
+        "quantita": 1,
+        "_id": "6a60e0fe3bce13afdbb40255"
+      }
+    ],
+    "_id": "6a60e0fe3bce13afdbb40254",
+    "__v": 0
   }
 ]

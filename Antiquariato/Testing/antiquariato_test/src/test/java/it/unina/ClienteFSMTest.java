@@ -250,7 +250,7 @@ public class ClienteFSMTest {
 
         @Test
         @DisplayName("Transizione S3 -> S0: Registrazione Avvenuta con Successo")
-        @Transizione({"S3->S0"})
+        @Transizione({"S0->S3", "S3->S0"})
         void testRegistrazioneSuccesso() {
             driver.get(BASE_URL);
             // 1. Vai in S3
@@ -258,10 +258,6 @@ public class ClienteFSMTest {
             wait.until(ExpectedConditions.visibilityOfElementLocated(By.id("form-register")));
 
             // 2. Generiamo dati casuali per evitare conflitti con utenti già esistenti.
-            // FIX: anche il numero di telefono deve essere randomizzato, non solo lo
-            // username. Da quando 'numero' ha un vincolo unique nel DB, riusare un
-            // valore fisso qui avrebbe fatto fallire la registrazione a ogni run
-            // successivo alla prima (numero già in uso da un'esecuzione precedente).
             long timestamp = System.currentTimeMillis();
             String username = "NuovoUtente_" + timestamp;
             String telefonoUnico = "3" + String.format("%09d", timestamp % 1_000_000_000L);
@@ -284,10 +280,8 @@ public class ClienteFSMTest {
             WebElement formLogin = wait.until(ExpectedConditions.visibilityOfElementLocated(By.id("form-login")));
             assertTrue(formLogin.isDisplayed(), "La registrazione doveva riportare l'utente allo stato S0 (Login).");
 
-            // Verifica di persistenza: l'utente deve essere stato realmente scritto
-            // nel DB, non solo mostrato come "successo" dall'alert del browser.
-            // La password non è verificabile qui perché salvata come hash bcrypt.
-            Document clienteCreato = trovaClienteNelDB(username);
+            // Verifica di persistenza nel DB
+           Document clienteCreato = trovaClienteNelDB(username);
             assertNotNull(clienteCreato, "L'utente doveva essere stato realmente scritto nel DB, non solo mostrato come successo dall'alert.");
             assertEquals(telefonoUnico, clienteCreato.getString("numero"), "Il numero di telefono salvato nel DB doveva corrispondere a quello inserito nel form.");
 

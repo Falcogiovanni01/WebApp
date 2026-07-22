@@ -17,8 +17,7 @@ import java.util.Set;
  * Funzionamento:
  * 1) testSuccessful(): ogni volta che un @Test annotato con @Transizione
  *    termina con SUCCESSO, le sue transizioni vengono aggiunte a un
- *    accumulatore statico (CLIENTE o GESTORE, deciso leggendo @CoperturaFSM
- *    sulla classe più esterna).
+ *    accumulatore statico (CLIENTE o GESTORE, deciso leggendo @CoperturaFSM).
  * 2) afterAll(): scatta per ogni nested class E per la classe esterna.
  *    Stampiamo il report SOLO quando scatta per la classe esterna (quella
  *    senza enclosing class), perché JUnit esegue gli afterAll delle nested
@@ -60,7 +59,7 @@ public class CoperturaFSMExtension implements TestWatcher, AfterAllCallback {
             corrente = corrente.getEnclosingClass();
         }
         // Fallback difensivo: se manca @CoperturaFSM sulla classe esterna,
-        // meglio non far fallire la suite per questo, ma il report andrà
+        // il report andrà
         // verificato manualmente in quel caso.
         return Fsm.CLIENTE;
     }

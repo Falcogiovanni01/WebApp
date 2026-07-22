@@ -6,8 +6,7 @@ import java.lang.annotation.RetentionPolicy;
 import java.lang.annotation.Target;
 
 /**
- * Da mettere sulla classe di test PIU' ESTERNA (es. ClienteFSMTest,
- * GestoreFSMTest) per dichiarare a quale FSM appartiene l'intera suite.
+ * Per dichiarare a quale FSM appartiene l'intera suite.
  *
  * Esempio:
  *
