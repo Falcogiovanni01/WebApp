@@ -34,7 +34,7 @@ public class GestoreFSMTest {
     
     private final String BASE_URL = "http://localhost:3000"; 
 
-    // --- METODI HELPER PER NON RIPETERE IL CODICE (DRY) ---
+    // --- METODI HELPER PER NON RIPETERE IL CODICE ---
 
     private void loginDiSupporto() {
         driver.manage().deleteAllCookies();
@@ -104,8 +104,7 @@ public class GestoreFSMTest {
             // 1. Apriamo il browser prima di ogni test
             driver.get(BASE_URL);
             
-            // 2. Questa è la riga MAGICA che risolve il tuo bug:
-            // Cancella ogni traccia di sessione precedente prima di testare il login
+            // 2. Cancella ogni traccia di sessione precedente prima di testare il login
             driver.manage().deleteAllCookies();
             
             // 3. Ricarichiamo la pagina per assicurarci che il server veda il browser "vergine"
@@ -120,7 +119,7 @@ public class GestoreFSMTest {
             // 1. Andiamo sulla pagina iniziale (Stato S0)
             driver.get(BASE_URL);
 
-            // 2. Troviamo i campi del form usando gli ID del tuo HTML
+            // 2. Troviamo i campi del form usando gli ID 
             WebElement userField = wait.until(ExpectedConditions.visibilityOfElementLocated(By.id("user")));
             WebElement passField = driver.findElement(By.id("pass"));
             WebElement loginButton = driver.findElement(By.cssSelector("#form-login-gestore button[type='submit']"));
@@ -163,7 +162,6 @@ public class GestoreFSMTest {
             // 5. Verifica Architetturale: Dobbiamo essere arrivati in S2.
             // L'overlay del login deve sparire e la dashboard deve apparire.
             // Cerchiamo un elemento che esiste SOLO nella dashboard, ad esempio il form per aggiungere un'opera.
-            // NOTA: Se l'ID del form nel tuo HTML è diverso, cambialo qui sotto!
             WebElement aggiungiOperaForm = wait.until(ExpectedConditions.visibilityOfElementLocated(By.id("form-aggiungi")));
             
             assertTrue(aggiungiOperaForm.isDisplayed(), "Il sistema doveva passare allo stato S2 (Dashboard Gestore).");
@@ -231,8 +229,8 @@ public class GestoreFSMTest {
 
         @BeforeEach
         void setupLoginDiServizio() {
-            // FIX: riusiamo l'helper loginDiSupporto() (già usato da S3_Modifica e S4_Rimozione),
-            // che cancella prima i cookie residui. Senza questo passaggio, se un test precedente
+            // riusiamo l'helper loginDiSupporto() (già usato da S3_Modifica e S4_Rimozione),
+            // Senza questo passaggio, se un test precedente
             // aveva già una sessione valida, l'overlay di login risultava già nascosto al reload
             // e #user non diventava mai "visibile" per Selenium (TimeoutException).
             loginDiSupporto();
@@ -242,7 +240,7 @@ public class GestoreFSMTest {
         @DisplayName("Transizioni Bidirezionali: S2 (Aggiungi) <-> S3 (Modifica)")
         @Transizione({"S2->S3", "S3->S2"})
         void testNavigazioneTabs() {
-            // 1. Troviamo i bottoni di navigazione (usando l'attributo data-target del tuo HTML)
+            // 1. Troviamo i bottoni di navigazione 
             WebElement btnModifica = driver.findElement(By.cssSelector("button[data-target='tab-modifica']"));
             WebElement btnAggiungi = driver.findElement(By.cssSelector("button[data-target='tab-aggiungi']"));
 
@@ -306,7 +304,7 @@ public class GestoreFSMTest {
             System.out.println(" [TEST SUPERATO] Transizione S2 -> S0 eseguita con successo. Sessione distrutta.");
         }
 
-        @Test
+    @Test
     @DisplayName("Transizione S2 -> S2: Aggiunta Nuova Opera (Dinamica)")
     @Transizione({"S2->S2"})
     void testAggiuntaNuovaOpera() {
@@ -455,7 +453,7 @@ public class GestoreFSMTest {
             driver.findElement(By.cssSelector("button[data-target='tab-rimuovi']")).click();
             WebElement formRimuovi = wait.until(ExpectedConditions.visibilityOfElementLocated(By.id("form-rimuovi")));
 
-            // Ora inseriamo SOLO il codice, in perfetta coerenza col tuo HTML
+            // Ora inseriamo SOLO il codice
             formRimuovi.findElement(By.name("codice")).sendKeys(codiceTest);
             formRimuovi.findElement(By.cssSelector("button[data-testid='btn-submit-rimuovi']")).click();
 
@@ -463,9 +461,6 @@ public class GestoreFSMTest {
 
             assertTrue(formRimuovi.isDisplayed(), "Il sistema doveva restare in S4 dopo l'eliminazione.");
           
-          
-            // Verifica di persistenza: l'opera deve essere stata realmente rimossa
-            // da MongoDB, non solo scomparsa dall'interfaccia.
             Document operaRimossa = trovaOperaNelDB(codiceTest);
             assertNull(operaRimossa, "L'opera doveva essere stata rimossa realmente dal DB, non solo dall'interfaccia.");
  
@@ -483,7 +478,7 @@ public class GestoreFSMTest {
 
         @BeforeEach
         void setup() {
-            loginDiSupporto(); // Qui facciamo SOLO il login. Niente spazzatura nel DB!
+            loginDiSupporto(); // Qui facciamo SOLO il login. 
         }
 
         @Test

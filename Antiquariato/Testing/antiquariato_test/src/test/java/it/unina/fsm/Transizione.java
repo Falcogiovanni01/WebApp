@@ -12,12 +12,6 @@ import java.lang.annotation.Target;
  * Un singolo test può coprire più archi in sequenza: es. un login riuscito
  * copre sia S0->S1 che S1->S2.
  *
- * Esempio d'uso:
- *
- *   @Test
- *   @Transizione({"S0->S1", "S1->S2"})
- *   void testLoginSuccesso() { ... }
- *
  * L'annotazione viene letta da CoperturaFSMExtension SOLO se il test termina
  * con successo (vedi TestWatcher#testSuccessful): una transizione "coperta"
  * significa quindi che il test che la esercita è passato, non solo che è

@@ -44,12 +44,12 @@ public class ClienteFSMTest {
     // Porta del server Cliente
     private final String BASE_URL = "http://localhost:3001";
 
-    // Inserisci qui le credenziali fisse del tuo utente di test nel DB
+    // utente di test nel DB
     private final String USER_TEST = "PROVA UTENTE";
     private final String PASS_TEST = "Prov@1000";
 
      // ============================================================
-    // FIX #3: Provisioning automatico dell'utente di test.
+    // Provisioning automatico dell'utente di test.
     // Non usa Selenium: è una chiamata HTTP diretta al server Cliente,
     // eseguita una sola volta prima di aprire il browser. Rende la suite
     // eseguibile da zero su un DB Mongo pulito, senza precondizioni manuali.
@@ -99,7 +99,7 @@ public class ClienteFSMTest {
         }
     }
 
-    // --- METODI HELPER (DRY) ---
+    // --- METODI HELPER ---
 
     private void svuotaSessioneTotale() {
         driver.get(BASE_URL);
@@ -127,9 +127,7 @@ public class ClienteFSMTest {
     // Verifiche di persistenza reale su MongoDB, non solo sull'interfaccia.
     // DB "Cliente" (da mongoose.connect nel server), collezioni derivate dalla
     // pluralizzazione automatica di Mongoose sui modelli "Cliente", "Ordine"
-    // e "Carrello". Nota: la password NON è verificabile qui perché è salvata
-    // come hash bcrypt one-way (FIX #4 lato server) — per quella servirebbe
-    // un round-trip HTTP di login, non una query diretta.
+    // e "Carrello". 
     // ============================================================
     private Document trovaClienteNelDB(String nome) {
         try (MongoClient mongoClient = MongoClients.create("mongodb://127.0.0.1:27017")) {
@@ -318,7 +316,7 @@ public class ClienteFSMTest {
         void testPersistenzaSessione() {
             eseguiLoginDiSupporto();
 
-            // SIMULIAMO L'USCITA E IL RIENTRO (Ricaricamento)
+            // SIMULIAMO L'USCITA E IL RIENTRO (Refresh della pagina)
             driver.navigate().refresh();
 
             // L'app deve saltare S0 e mostrare subito la dashboard (S2)
@@ -394,17 +392,17 @@ public class ClienteFSMTest {
       @Test
         @DisplayName("Flusso S2 -> S4: Aggiunta e Rimozione dal Carrello")
         @Transizione({"S2->S4", "S4->S4", "S4->S2", "S2->S2"})
-        // NOTA: include anche le transizioni del blocco di pre-pulizia (S2->S4 per
+        // include anche le transizioni del blocco di pre-pulizia (S2->S4 per
         // entrare nel carrello, S4->S4 per rimuovere eventuali residui, S4->S2 per
         // tornare al catalogo), perché è stato deciso di contare come "verificate"
         // anche le azioni UI reali dentro il corpo del test, non solo quelle seguite
         // da un assert esplicito.
         void testAggiungiERimuoviCarrello() {
-            // --- FASE DI PRE-PULIZIA (Garantisce l'isolamento del test) ---
+
             driver.findElement(By.cssSelector("button[data-target='tab-carrello']")).click();
             wait.until(ExpectedConditions.visibilityOfElementLocated(By.id("tab-carrello")));
 
-            // Se ci sono già opere nel carrello, rimuoviamole tutte cliccando in loop.
+            // Se ci sono già opere nel carrello, le rimuoviamo tutte cliccando in loop.
             // aspettiamo esplicitamente che il numero di bottoni "Rimuovi"
             // sia realmente diminuito dopo ogni click, prima di procedere con il successivo.
             int numeroResidui = driver.findElements(By.xpath("//button[contains(text(), 'Rimuovi')]")).size();
@@ -414,11 +412,9 @@ public class ClienteFSMTest {
                 wait.until(d -> d.findElements(By.xpath("//button[contains(text(), 'Rimuovi')]")).size() < contoPrimaDelClick);
             }
 
-            // Torniamo al catalogo per iniziare il test vero e proprio
             driver.findElement(By.cssSelector("button[data-target='tab-catalogo']")).click();
             wait.until(ExpectedConditions.visibilityOfElementLocated(By.id("tab-catalogo")));
             // ---------------------------------------------------------------
-
 
             // 1. Aggiungiamo un'opera
             WebElement btnAggiungi = wait.until(ExpectedConditions.elementToBeClickable(By.xpath("(//button[contains(text(), 'Aggiungi al Carrello')])[1]")));
@@ -433,7 +429,7 @@ public class ClienteFSMTest {
             WebElement btnRimuovi = wait.until(ExpectedConditions.elementToBeClickable(By.xpath("//button[contains(text(), 'Rimuovi')]")));
             btnRimuovi.click();
 
-            // 4. Ora siamo certi che il carrello scenda a ZERO. Il bottone deve sparire.
+            // 4. Ora siamo certi che il carrello sia vuoto. Il bottone deve sparire.
             Boolean isCartEmpty = wait.until(ExpectedConditions.invisibilityOfElementLocated(By.id("btn-acquista")));
             assertTrue(isCartEmpty, "L'opera non è stata rimossa correttamente o c'erano residui.");
             System.out.println("[TEST SUPERATO] Rimozione dal carrello completata (con pulizia preventiva).");
@@ -442,7 +438,7 @@ public class ClienteFSMTest {
         @Test
         @DisplayName("Flusso End-to-End: S2 -> S4 -> Acquisto Definitivo")
         @Transizione({"S2->S2", "S2->S4", "S4->S4"})
-        // NOTA: "S2->S2" corrisponde al click su "Aggiungi al Carrello" fatto dal
+        // "S2->S2" corrisponde al click su "Aggiungi al Carrello" fatto dal
         // catalogo prima di spostarsi nel carrello; mancava nella versione precedente.
         void testFlussoAcquisto() {
             // 1. Aggiungiamo al carrello
@@ -478,7 +474,7 @@ public class ClienteFSMTest {
         @Test
         @DisplayName("Transizione S2/S4 -> S0: Logout Cliente")
         @Transizione({"S2->S0"})
-        // NOTA: qui viene testato solo il logout dalla tab di default (S2, Catalogo),
+        // qui viene testato solo il logout dalla tab di default (S2, Catalogo),
         // perché eseguiLoginDiSupporto() atterra sempre su S2 e il corpo del test
         // non naviga verso S4 prima di cliccare logout. "S4->S0" resta scoperto
         // finché non si scrive un test dedicato che fa logout dal carrello.

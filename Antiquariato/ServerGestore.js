@@ -155,7 +155,7 @@ app.post('/ModificaOpera', requireAuth,  async (req, res) => {
 // Rimuovi Opera
 app.post('/RimuoviOpera', requireAuth, async (req, res) => {
     try {
-        // FIX: Cerchiamo SOLO per codice 
+        // Cerchiamo SOLO per codice 
         const condition = { codice: req.body.codice };
         const result = await Opera.findOne(condition);
         
@@ -186,14 +186,14 @@ app.post('/RimuoviOpera', requireAuth, async (req, res) => {
 });
 
 
-// Report Acquisti Effettuati dai Clienti (Risolto bug di riferimento oggetti)
+// Report Acquisti Effettuati dai Clienti 
 app.get('/reportAcquisti', requireAuth, (req, res) => {
     try {
         if (!fs.existsSync(ordiniFilePath)) return res.json([]);
         const leggiFile = fs.readFileSync(ordiniFilePath, 'utf-8');
         const ordini = leggiFile ? JSON.parse(leggiFile) : [];
 
-        // Aggregazione corretta tramite mappa per evitare duplicazioni e sovrascritture di puntatori
+        // per evitare duplicazioni e sovrascritture di puntatori
         const aggregazione = {};
         ordini.forEach((ordine) => {
             const utente = ordine.utente;
